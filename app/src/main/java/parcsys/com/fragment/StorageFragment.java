@@ -1,11 +1,13 @@
 package parcsys.com.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -39,11 +41,16 @@ public class StorageFragment extends ListFragment {
         SoldItemAdapter adapter = new SoldItemAdapter(getActivity().getApplicationContext(), testData);
         setListAdapter(adapter);
 
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                for (int j = 0; j < parent.getChildCount(); j++) {
+                    parent.getChildAt(j).setBackgroundColor(Color.WHITE);
+                }
+                view.setBackgroundColor(Color.TRANSPARENT);
+                selected = testData.get(position);
+            }
+        });
     }
 
     private void addTestData() {
