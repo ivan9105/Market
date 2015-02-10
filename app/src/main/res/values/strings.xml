@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AndroidMarket</string>
+    <string name="app_name">Market</string>
     <string name="action_settings">Settings</string>
     <string name="amount">Amount\u00A0</string>
     <string name="price">Price</string>
@@ -10,5 +10,7 @@
     <string name="nameColumn">Description</string>
     <string name="priceColumn">Price</string>
     <string name="amtColumn">Amt</string>
+    <string name="card">Card</string>
+    <string name="buy">Buy</string>
 
 </resources>
