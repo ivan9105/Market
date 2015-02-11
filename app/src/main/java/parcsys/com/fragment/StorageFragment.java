@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,8 @@ import parcsys.com.marketfinal.R;
 public class StorageFragment extends ListFragment {
     List<SoldItem> testData = new ArrayList<SoldItem>();
 
-    private SoldItem selected;
+    private SoldItem selectedItem;
+    private View selectedView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,11 +44,18 @@ public class StorageFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                for (int j = 0; j < parent.getChildCount(); j++) {
-                    parent.getChildAt(j).setBackgroundColor(Color.WHITE);
+                if (selectedView != null) {
+                    selectedView.setBackgroundColor(Color.WHITE);
                 }
-                view.setBackgroundColor(Color.TRANSPARENT);
-                selected = testData.get(position);
+                if (selectedView != view) {
+                    selectedView = view;
+                    selectedView.setBackgroundColor(Color.TRANSPARENT);
+
+                    selectedItem = testData.get(position);
+                } else {
+                    selectedView = null;
+                    selectedItem = null;
+                }
             }
         });
     }
