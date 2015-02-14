@@ -7,10 +7,4 @@
         market_app:showAsAction="ifRoom"
         android:title="@string/card"/>
 
-    <item
-        android:id="@+id/buy_action"
-        android:icon="@drawable/buy"
-        market_app:showAsAction="ifRoom"
-        android:title="@string/buy"/>
-
 </menu>

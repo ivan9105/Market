@@ -61,7 +61,7 @@ public class StorageFragment extends ListFragment {
     }
 
     private void addTestData() {
-        testData.add(createItem("IPhone6 Black 32Gb quarterCore 2048 MB, discount 5%", SoldDestinationType.TECHNOLOGY, 60000.00, 4));
+        testData.add(createItem("IPhone6 Black 32Gb quarterCore 2048 MB, discount 5%, video 512 mb, raw 4 gb, size 520 x 650", SoldDestinationType.TECHNOLOGY, 60000.00, 4));
         testData.add(createItem("Huawey300Y Ascend doubleCore 1Gg 512 MB", SoldDestinationType.TECHNOLOGY, 5000.00, 5));
         testData.add(createItem("Sausiges Quality Factory 1 kg", SoldDestinationType.PRODUCTS, 245.00, 300));
         testData.add(createItem("Meat beaf 1 kg", SoldDestinationType.PRODUCTS, 400.00, 100));
