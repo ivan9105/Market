@@ -1,5 +1,6 @@
 package parcsys.com.fragment;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -38,9 +39,15 @@ public class StorageFragment extends ListFragment {
 
         addTestData();
 
-        SoldItemAdapter adapter = new SoldItemAdapter(getActivity().getApplicationContext(), testData);
+        int currentOrientation = getResources().getConfiguration().orientation;
+        SoldItemAdapter adapter = new SoldItemAdapter
+                              (getActivity().getApplicationContext(), testData, currentOrientation);
         setListAdapter(adapter);
 
+        addSelectedLogic();
+    }
+
+    private void addSelectedLogic() {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
