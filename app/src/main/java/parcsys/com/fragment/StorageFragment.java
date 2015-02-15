@@ -30,7 +30,12 @@ public class StorageFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.storage, null);
+        int currentOrientation = getCurrentOrientation();
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            return inflater.inflate(R.layout.storage_potrait, null);
+        } else {
+            return inflater.inflate(R.layout.storage_landscape, null);
+        }
     }
 
     @Override
@@ -39,12 +44,15 @@ public class StorageFragment extends ListFragment {
 
         addTestData();
 
-        int currentOrientation = getResources().getConfiguration().orientation;
         SoldItemAdapter adapter = new SoldItemAdapter
-                              (getActivity().getApplicationContext(), testData, currentOrientation);
+                              (getActivity().getApplicationContext(), testData, getCurrentOrientation());
         setListAdapter(adapter);
 
         addSelectedLogic();
+    }
+
+    private int getCurrentOrientation() {
+        return getResources().getConfiguration().orientation;
     }
 
     private void addSelectedLogic() {

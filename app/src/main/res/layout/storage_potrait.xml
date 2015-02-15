@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:shrinkColumns="*"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:background="#fad06e">
+
+            <TextView
+                android:id="@+id/soldTitleField"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="2.3"
+                android:textColor="#000000"
+                android:layout_margin="3dp"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:text="@string/nameColumn"/>
+
+            <LinearLayout
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/soldPriceField"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1px"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:background="#fad06e"
+                    android:text="@string/priceColumn"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/soldAmountField"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1px"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="#fad06e"
+                    android:text="@string/amtColumn"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+
+    <ListView
+        android:id="@id/android:list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

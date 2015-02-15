@@ -20,26 +20,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setSubtitle("mytest");
-        actionBar.setTitle("vogella.com");
-        actionBar.setIcon(null);
-        actionBar.show();
-        getOverflowMenu();*/
-    }
-
-    private void getOverflowMenu() {
-        try {
-            ViewConfiguration config = ViewConfiguration.get(this);
-            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if(menuKeyField != null) {
-                menuKeyField.setAccessible(true);
-                menuKeyField.setBoolean(config, false);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
