@@ -3,6 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="80dp"
     android:background="#ffffff">
 
     <TextView
@@ -15,8 +16,7 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="end"
+        android:layout_height="match_parent"
         android:layout_weight="1.2">
 
         <LinearLayout
@@ -42,7 +42,8 @@
         <Button
             android:id="@+id/btn_buy"
             android:layout_width="55dp"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
             android:text="@string/buy"
             android:textColor="#000000"
             android:textSize="16sp" />
