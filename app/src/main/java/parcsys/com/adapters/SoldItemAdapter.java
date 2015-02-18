@@ -45,7 +45,11 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
 
         SoldItem item = items.get(position);
 
-        ((TextView) view.findViewById(R.id.soldTitleField)).setText(item.getTitle());
+        String titleText = item.getTitle();
+        if (titleText.length() > 80) {
+            titleText = titleText.substring(0, 78) + "...";
+        }
+        ((TextView) view.findViewById(R.id.soldTitleField)).setText(titleText);
         ((TextView) view.findViewById(R.id.soldPriceField)).setText(doubleFormat(item.getPrice()));
         ((TextView) view.findViewById(R.id.soldAmountField)).setText(String.valueOf(item.getAmount()));
 
