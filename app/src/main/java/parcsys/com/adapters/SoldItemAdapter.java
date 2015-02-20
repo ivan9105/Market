@@ -51,12 +51,13 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         SoldItem item = items.get(position);
 
         String titleText = item.getTitle();
-        if (titleText.length() > 80) {
-            titleText = titleText.substring(0, 78) + "...";
+        if (titleText.length() > 64) {
+            titleText = titleText.substring(0, 60) + "...";
         }
         ((TextView) view.findViewById(R.id.soldTitleField)).setText(titleText);
         ((TextView) view.findViewById(R.id.soldPriceField)).setText(doubleFormat(item.getPrice()));
         ((TextView) view.findViewById(R.id.soldAmountField)).setText(String.valueOf(item.getAmount()));
+        ((TextView) view.findViewById(R.id.typeField)).setText("Type: " + item.getType().getId());
 
         final Button buttonBuy = (Button) view.findViewById(R.id.btn_buy);
         if (notEnabledSet.contains(position)) {
