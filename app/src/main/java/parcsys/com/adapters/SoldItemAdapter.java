@@ -2,6 +2,7 @@ package parcsys.com.adapters;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,5 +81,13 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
     private String doubleFormat(double price) {
         DecimalFormat formatter = new DecimalFormat("0.00");
         return formatter.format(price);
+    }
+
+    public Set<Integer> getNotEnabledSet() {
+        return notEnabledSet;
+    }
+
+    public void setNotEnabledSet(Set<Integer> notEnabledSet) {
+        this.notEnabledSet = notEnabledSet;
     }
 }

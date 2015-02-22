@@ -3,6 +3,7 @@ package parcsys.com.fragment;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -11,7 +12,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import parcsys.com.adapters.SoldItemAdapter;
@@ -24,9 +29,7 @@ import parcsys.com.marketfinal.R;
  */
 public class StorageFragment extends ListFragment {
     List<SoldItem> testData = new ArrayList<SoldItem>();
-
-    private SoldItem selectedItem;
-    private View selectedView;
+    private SoldItemAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,35 +47,13 @@ public class StorageFragment extends ListFragment {
 
         addTestData();
 
-        SoldItemAdapter adapter = new SoldItemAdapter
+        this.adapter = new SoldItemAdapter
                               (getActivity().getApplicationContext(), testData, getCurrentOrientation());
         setListAdapter(adapter);
-
-        addSelectedLogic();
     }
 
     private int getCurrentOrientation() {
         return getResources().getConfiguration().orientation;
-    }
-
-    private void addSelectedLogic() {
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (selectedView != null) {
-                    selectedView.setBackgroundColor(Color.WHITE);
-                }
-                if (selectedView != view) {
-                    selectedView = view;
-                    selectedView.setBackgroundColor(Color.TRANSPARENT);
-
-                    selectedItem = testData.get(position);
-                } else {
-                    selectedView = null;
-                    selectedItem = null;
-                }
-            }
-        });
     }
 
     private void addTestData() {
@@ -107,5 +88,31 @@ public class StorageFragment extends ListFragment {
         item.setType(type);
 
         return item;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (outState == null) {
+            outState = new Bundle();
+        }
+        Set<Integer> notEnabledSet = adapter.getNotEnabledSet();
+        outState.putInt("length", notEnabledSet.toArray().length);
+        for (int i = 0; i < notEnabledSet.toArray().length; i++) {
+            outState.putInt(String.valueOf(i), (Integer) notEnabledSet.toArray()[i]);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.get("length") != null) {
+            Integer length = (Integer) savedInstanceState.get("length");
+            Set<Integer> notEnabledSet = new HashSet<Integer>();
+            for (int i = 0; i < length; i++) {
+                notEnabledSet.add((Integer) savedInstanceState.get(String.valueOf(i)));
+            }
+            adapter.setNotEnabledSet(notEnabledSet);
+        }
+        super.onViewStateRestored(savedInstanceState);
     }
 }
