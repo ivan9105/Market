@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -27,7 +28,6 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
     private Context ctx;
     private List<SoldItem> items;
     private int currentOrientation;
-    private Set<Integer> notEnabledSet = new HashSet<Integer>();
 
     public SoldItemAdapter(Context ctx, List<SoldItem> items, int currentOrientation) {
         super(ctx, R.layout.sold_item_portrait, items);
@@ -41,7 +41,7 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         LayoutInflater inflater = (LayoutInflater) ctx
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View view;
+        final View view;
         if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             view = inflater.inflate(R.layout.sold_item_landscape, parent, false);
         } else {
@@ -60,20 +60,8 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         ((TextView) view.findViewById(R.id.soldAmountField)).setText(String.valueOf(item.getAmount()));
         ((TextView) view.findViewById(R.id.typeField)).setText("Type: " + item.getType().getId());
 
-        final Button buttonBuy = (Button) view.findViewById(R.id.btn_buy);
-        if (notEnabledSet.contains(position)) {
-            buttonBuy.setEnabled(false);
-        }
-
-        buttonBuy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonBuy.setEnabled(false);
-                if (!notEnabledSet.contains(position)) {
-                    notEnabledSet.add(position);
-                }
-            }
-        });
+        Button buttonBuy = (Button) view.findViewById(R.id.btn_buy);
+        buttonBuy.setOnClickListener(new BuyOnClickListener(position));
 
         return view;
     }
@@ -83,11 +71,26 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         return formatter.format(price);
     }
 
-    public Set<Integer> getNotEnabledSet() {
-        return notEnabledSet;
+    public List<SoldItem> getItems() {
+        return items;
     }
 
-    public void setNotEnabledSet(Set<Integer> notEnabledSet) {
-        this.notEnabledSet = notEnabledSet;
+    public void setItems(List<SoldItem> items) {
+        this.items = items;
+    }
+
+    private class BuyOnClickListener implements View.OnClickListener {
+        private int position;
+
+        public BuyOnClickListener(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            SoldItem soldItem = items.get(position);
+            soldItem.setAmount(soldItem.getAmount() - 1);
+            notifyDataSetChanged();
+        }
     }
 }
