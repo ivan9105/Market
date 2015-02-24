@@ -95,26 +95,17 @@ public class StorageFragment extends ListFragment {
         if (outState == null) {
             outState = new Bundle();
         }
-
-        /*
-        Set<Integer> notEnabledSet = adapter.getNotEnabledSet();
-        outState.putInt("length", notEnabledSet.toArray().length);
-        for (int i = 0; i < notEnabledSet.toArray().length; i++) {
-            outState.putInt(String.valueOf(i), (Integer) notEnabledSet.toArray()[i]);
-        }*/
+        List<SoldItem> items = adapter.getItems();
+        outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        /*if (savedInstanceState != null && savedInstanceState.get("length") != null) {
-            Integer length = (Integer) savedInstanceState.get("length");
-            Set<Integer> notEnabledSet = new HashSet<Integer>();
-            for (int i = 0; i < length; i++) {
-                notEnabledSet.add((Integer) savedInstanceState.get(String.valueOf(i)));
-            }
-            adapter.setNotEnabledSet(notEnabledSet);
-        }*/
+        if (savedInstanceState != null && savedInstanceState.get("items") != null) {
+            List<SoldItem> items = savedInstanceState.getParcelableArrayList("items");
+            adapter.setItems(items);
+        }
         super.onViewStateRestored(savedInstanceState);
     }
 }

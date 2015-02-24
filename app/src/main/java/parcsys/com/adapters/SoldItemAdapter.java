@@ -89,7 +89,11 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         @Override
         public void onClick(View v) {
             SoldItem soldItem = items.get(position);
-            soldItem.setAmount(soldItem.getAmount() - 1);
+            if (soldItem.getAmount() - 1 > 0) {
+                soldItem.setAmount(soldItem.getAmount() - 1);
+            } else {
+                items.remove(position);
+            }
             notifyDataSetChanged();
         }
     }
