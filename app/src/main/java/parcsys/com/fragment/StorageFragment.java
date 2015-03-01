@@ -30,6 +30,11 @@ import parcsys.com.marketfinal.R;
 public class StorageFragment extends ListFragment {
     List<SoldItem> testData = new ArrayList<SoldItem>();
     private SoldItemAdapter adapter;
+    private Boolean isCreated;
+
+    public StorageFragment() {
+        isCreated = false;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,11 +50,13 @@ public class StorageFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        addTestData();
-
-        this.adapter = new SoldItemAdapter
-                              (getActivity().getApplicationContext(), testData, getCurrentOrientation());
-        setListAdapter(adapter);
+        if (!isCreated) {
+            addTestData();
+            this.adapter = new SoldItemAdapter
+                    (getActivity().getApplicationContext(), testData, getCurrentOrientation());
+            setListAdapter(adapter);
+        }
+        isCreated = true;
     }
 
     private int getCurrentOrientation() {
@@ -97,14 +104,24 @@ public class StorageFragment extends ListFragment {
         }
         List<SoldItem> items = adapter.getItems();
         outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
+        outState.putInt("currentPosition", getListView().getFirstVisiblePosition());
+        outState.putBoolean("isCreated", isCreated);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null && savedInstanceState.get("items") != null) {
-            List<SoldItem> items = savedInstanceState.getParcelableArrayList("items");
-            adapter.setItems(items);
+        if (savedInstanceState != null) {
+            isCreated = (Boolean) savedInstanceState.get("isCreated");
+
+            if (savedInstanceState.get("items") != null) {
+                List<SoldItem> items = savedInstanceState.getParcelableArrayList("items");
+                this.adapter = new SoldItemAdapter
+                        (getActivity().getApplicationContext(), items, getCurrentOrientation());
+                setListAdapter(adapter);
+            }
+
+            getListView().setSelection((Integer) savedInstanceState.get("currentPosition"));
         }
         super.onViewStateRestored(savedInstanceState);
     }

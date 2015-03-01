@@ -75,10 +75,6 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         return items;
     }
 
-    public void setItems(List<SoldItem> items) {
-        this.items = items;
-    }
-
     private class BuyOnClickListener implements View.OnClickListener {
         private int position;
 
