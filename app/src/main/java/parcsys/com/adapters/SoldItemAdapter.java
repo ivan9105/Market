@@ -1,11 +1,15 @@
 package parcsys.com.adapters;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -61,7 +65,7 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         ((TextView) view.findViewById(R.id.typeField)).setText("Type: " + item.getType().getId());
 
         Button buttonBuy = (Button) view.findViewById(R.id.btn_buy);
-        buttonBuy.setOnClickListener(new BuyOnClickListener(position));
+        buttonBuy.setOnClickListener(new BuyOnClickListener(position, view));
 
         return view;
     }
@@ -77,9 +81,11 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
 
     private class BuyOnClickListener implements View.OnClickListener {
         private int position;
+        private View parentView;
 
-        public BuyOnClickListener(int position) {
+        public BuyOnClickListener(int position, View parentView) {
             this.position = position;
+            this.parentView = parentView;
         }
 
         @Override
@@ -87,10 +93,40 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
             SoldItem soldItem = items.get(position);
             if (soldItem.getAmount() - 1 > 0) {
                 soldItem.setAmount(soldItem.getAmount() - 1);
+                notifyDataSetChanged();
             } else {
-                items.remove(position);
+                removeItem();
             }
-            notifyDataSetChanged();
+        }
+
+        private void removeItem() {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(parentView, "x", 5000f);
+            animation.setDuration(500);
+            animation.addListener(createRemoveItemListener());
+            animation.start();
+        }
+
+        private Animator.AnimatorListener createRemoveItemListener() {
+            return new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    items.remove(position);
+                    notifyDataSetChanged();
+                    animation.cancel();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            };
         }
     }
 }
