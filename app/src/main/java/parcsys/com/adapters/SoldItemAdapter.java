@@ -32,6 +32,7 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
     private Context ctx;
     private List<SoldItem> items;
     private int currentOrientation;
+    private SoldItem removedItem;
 
     public SoldItemAdapter(Context ctx, List<SoldItem> items, int currentOrientation) {
         super(ctx, R.layout.sold_item_portrait, items);
@@ -95,6 +96,7 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
                 soldItem.setAmount(soldItem.getAmount() - 1);
                 notifyDataSetChanged();
             } else {
+                removedItem = soldItem;
                 removeItem();
             }
         }
@@ -114,9 +116,11 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    items.remove(position);
-                    notifyDataSetChanged();
-                    animation.cancel();
+                    if (items.get(position).equals(removedItem)) {
+                        items.remove(position);
+                        notifyDataSetChanged();
+                        animation.cancel();
+                    }
                 }
 
                 @Override
