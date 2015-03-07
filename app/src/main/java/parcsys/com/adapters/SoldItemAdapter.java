@@ -94,43 +94,10 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
             SoldItem soldItem = items.get(position);
             if (soldItem.getAmount() - 1 > 0) {
                 soldItem.setAmount(soldItem.getAmount() - 1);
-                notifyDataSetChanged();
             } else {
-                removedItem = soldItem;
-                removeItem();
+                items.remove(position);
             }
-        }
-
-        private void removeItem() {
-            ObjectAnimator animation = ObjectAnimator.ofFloat(parentView, "x", 5000f);
-            animation.setDuration(500);
-            animation.addListener(createRemoveItemListener());
-            animation.start();
-        }
-
-        private Animator.AnimatorListener createRemoveItemListener() {
-            return new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if (items.get(position).equals(removedItem)) {
-                        items.remove(position);
-                        notifyDataSetChanged();
-                        animation.cancel();
-                    }
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-            };
+            notifyDataSetChanged();
         }
     }
 }

@@ -1,22 +1,15 @@
 package parcsys.com.fragment;
 
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import parcsys.com.adapters.SoldItemAdapter;
@@ -28,12 +21,10 @@ import parcsys.com.marketfinal.R;
  * Created by Иван on 25.01.2015.
  */
 public class StorageFragment extends ListFragment {
-    List<SoldItem> testData = new ArrayList<SoldItem>();
+    List<SoldItem> items;
     private SoldItemAdapter adapter;
-    private Boolean isCreated;
 
     public StorageFragment() {
-        isCreated = false;
     }
 
     @Override
@@ -49,80 +40,23 @@ public class StorageFragment extends ListFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        List<SoldItem> testData = getArguments().getParcelableArrayList("items");
+        this.adapter = new SoldItemAdapter
+                (getActivity().getApplicationContext(), testData, getCurrentOrientation());
+        setListAdapter(adapter);
 
-        if (!isCreated) {
-            addTestData();
-            this.adapter = new SoldItemAdapter
-                    (getActivity().getApplicationContext(), testData, getCurrentOrientation());
-            setListAdapter(adapter);
+        int currentPosition = getArguments().getInt("currentPosition");
+        if (currentPosition != 0) {
+            getListView().setVerticalScrollbarPosition(currentPosition);
         }
-        isCreated = true;
     }
 
     private int getCurrentOrientation() {
         return getResources().getConfiguration().orientation;
     }
 
-    private void addTestData() {
-        testData.add(createItem("IPhone6 Black 32Gb quarterCore 2048 MB, discount 5%, video 512 mb, raw 4 gb, size 520 x 650", SoldDestinationType.TECHNOLOGY, 60000.00, 4));
-        testData.add(createItem("Huawey300Y Ascend doubleCore 1Gg 512 MB", SoldDestinationType.TECHNOLOGY, 5000.00, 5));
-        testData.add(createItem("Sausiges Quality Factory 1 kg", SoldDestinationType.PRODUCTS, 245.00, 300));
-        testData.add(createItem("Meat beaf 1 kg", SoldDestinationType.PRODUCTS, 400.00, 100));
-        testData.add(createItem("Bread white 250 gr", SoldDestinationType.PRODUCTS, 25.00, 400));
-        testData.add(createItem("Milk 1l", SoldDestinationType.PRODUCTS, 55.00, 300));
-        testData.add(createItem("Eggs 40 items", SoldDestinationType.PRODUCTS, 65.00, 1300));
-        testData.add(createItem("Huawey600Y Ascend quarterCore 3Gg 1024MB 17d", SoldDestinationType.TECHNOLOGY, 6245.00, 3));
-        testData.add(createItem("IPhone4 White 16 Gb doubleCore 1024 Mb", SoldDestinationType.TECHNOLOGY, 12245.00, 30));
-        testData.add(createItem("Shovel big great white", SoldDestinationType.HOUSEHOLD_GOODS, 1245.00, 130));
-        testData.add(createItem("Brush", SoldDestinationType.HOUSEHOLD_GOODS, 145.00, 530));
-        testData.add(createItem("Broom", SoldDestinationType.HOUSEHOLD_GOODS, 215.00, 330));
-        testData.add(createItem("Scoop", SoldDestinationType.HOUSEHOLD_GOODS, 65.00, 330));
-        testData.add(createItem("Towel", SoldDestinationType.HOUSEHOLD_GOODS, 165.00, 1330));
-        testData.add(createItem("Chair", SoldDestinationType.HOUSEHOLD_GOODS, 10000, 7));
-        testData.add(createItem("Red chair", SoldDestinationType.HOUSEHOLD_GOODS, 11000, 17));
-        testData.add(createItem("Black chair", SoldDestinationType.HOUSEHOLD_GOODS, 11500, 11));
-        testData.add(createItem("Mini sofa", SoldDestinationType.HOUSEHOLD_GOODS, 12000, 3));
-        testData.add(createItem("Big sofa", SoldDestinationType.HOUSEHOLD_GOODS, 17000, 2));
-        testData.add(createItem("Big white sofa", SoldDestinationType.HOUSEHOLD_GOODS, 19000, 4));
+    public List<SoldItem> getItems() {
+        return adapter.getItems();
     }
 
-    private SoldItem createItem(String title, SoldDestinationType type, double price, int amount) {
-        SoldItem item = new SoldItem();
-        item.setId(UUID.randomUUID());
-        item.setTitle(title);
-        item.setPrice(price);
-        item.setAmount(amount);
-        item.setType(type);
-
-        return item;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (outState == null) {
-            outState = new Bundle();
-        }
-        List<SoldItem> items = adapter.getItems();
-        outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
-        outState.putInt("currentPosition", getListView().getFirstVisiblePosition());
-        outState.putBoolean("isCreated", isCreated);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            isCreated = (Boolean) savedInstanceState.get("isCreated");
-
-            if (savedInstanceState.get("items") != null) {
-                List<SoldItem> items = savedInstanceState.getParcelableArrayList("items");
-                this.adapter = new SoldItemAdapter
-                        (getActivity().getApplicationContext(), items, getCurrentOrientation());
-                setListAdapter(adapter);
-            }
-
-            getListView().setSelection((Integer) savedInstanceState.get("currentPosition"));
-        }
-        super.onViewStateRestored(savedInstanceState);
-    }
 }
