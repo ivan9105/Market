@@ -13,8 +13,8 @@ import parcsys.com.entity.enums.SoldDestinationType;
 public class SoldItem implements Parcelable{
     private UUID id;
     private String title;
-    private int amount;
-    private double price;
+    private Integer amount;
+    private Double price;
     private String type;
 
     public SoldItem(){}
@@ -35,19 +35,19 @@ public class SoldItem implements Parcelable{
         this.title = title;
     }
 
-    public int getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -67,7 +67,10 @@ public class SoldItem implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{id.toString(), title, type});
+        dest.writeStringArray(new String[]{
+                String.valueOf(id),
+                title,
+                type});
         dest.writeInt(amount);
         dest.writeDouble(price);
     }
@@ -87,7 +90,9 @@ public class SoldItem implements Parcelable{
     private SoldItem(Parcel parcel) {
         String[] data = new String[3];
         parcel.readStringArray(data);
-        this.id = UUID.fromString(data[0]);
+        if (data[0] != null) {
+            this.id = UUID.fromString(data[0]);
+        }
         this.title = data[1];
         this.type = data[2];
         this.amount = parcel.readInt();

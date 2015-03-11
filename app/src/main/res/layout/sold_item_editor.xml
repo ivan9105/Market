@@ -1,24 +1,69 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical">
-    <EditText
+    <TextView
+        android:id="@+id/textTitle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:text="@string/title"/>
+    <EditText
         android:id="@+id/editTitle"
-        android:inputType="text"/>
-    <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:inputType="text" />
+    <TextView
+        android:id="@+id/textAmount"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/amtColumn"/>
+    <EditText
         android:id="@+id/editAmount"
-        android:inputType="number"/>
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number" />
+    <TextView
+        android:id="@+id/textPrice"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/priceColumn"/>
     <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/editPrice"
-        android:inputType="number"/>
-    <Spinner
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/soldType"/>
+        android:inputType="number" />
+    <TextView
+        android:id="@+id/textType"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/type"/>
+    <Spinner
+        android:id="@+id/soldType"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    <!--Todo внизу экрана самого внизу похуй на spinner bug-->
+    <LinearLayout
+        android:id="@+id/button_panel"
+        android:layout_width="fill_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="wrap_content"
+        android:minHeight="60dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/ok"
+            style="@style/AppThemeLight"/>
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/cancel"
+            style="@style/AppThemeLight"/>
     </LinearLayout>
+</LinearLayout>

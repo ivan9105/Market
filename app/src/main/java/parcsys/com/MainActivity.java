@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import parcsys.com.adapters.SoldItemAdapter;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.fragment.SoldItemEditor;
@@ -26,6 +25,7 @@ public class MainActivity extends ActionBarActivity {
     private List<SoldItem> testData = new ArrayList<SoldItem>();
     private Boolean isCreated;
     private Integer currentPosition;
+    private Boolean isStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,18 +39,31 @@ public class MainActivity extends ActionBarActivity {
             isCreated = true;
         }
 
-        storageFragment = new StorageFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("items", (ArrayList<? extends android.os.Parcelable>) testData);
-        if (currentPosition != null) {
-            bundle.putInt("currentPosition", currentPosition);
-        }
-        storageFragment.setArguments(bundle);
-        soldItemEditor = new SoldItemEditor();
+        //Todo test editor remove this item before
+        isStorage = false;
 
-        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
-        fragmentTransaction.commit();
+        if (isStorage == null || isStorage) {
+            storageFragment = new StorageFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("items", (ArrayList<? extends android.os.Parcelable>) testData);
+            if (currentPosition != null) {
+                bundle.putInt("currentPosition", currentPosition);
+            }
+            storageFragment.setArguments(bundle);
+            soldItemEditor = new SoldItemEditor();
+
+            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
+            fragmentTransaction.commit();
+            isStorage = true;
+        } else {
+            soldItemEditor = new SoldItemEditor();
+
+            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.fragmentFrame, soldItemEditor);
+            fragmentTransaction.commit();
+            isStorage = true;
+        }
     }
 
     private void restoreData(Bundle savedInstanceState) {
@@ -58,6 +71,7 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
+        isStorage = (Boolean) savedInstanceState.get("isStorage");
         isCreated = (Boolean) savedInstanceState.get("isCreated");
 
         if (savedInstanceState.get("items") != null) {
@@ -93,10 +107,23 @@ public class MainActivity extends ActionBarActivity {
         if (outState == null) {
             outState = new Bundle();
         }
-        List<SoldItem> items = storageFragment.getItems();
-        outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
-        outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
+        if (storageFragment != null) {
+            List<SoldItem> items = storageFragment.getItems();
+            outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
+            outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
+            //Todo проверить
+            getSupportFragmentManager().beginTransaction().
+                    remove(storageFragment).commit();
+        }
         outState.putBoolean("isCreated", isCreated);
+        outState.putBoolean("isStorage", isStorage);
+
+        if (soldItemEditor != null) {
+            getSupportFragmentManager().beginTransaction().
+                    remove(soldItemEditor).
+                    commit();
+        }
+
         super.onSaveInstanceState(outState);
     }
 

@@ -12,5 +12,7 @@
     <string name="amtColumn">Amt</string>
     <string name="card">Card</string>
     <string name="buy">Buy</string>
-
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="empty"/>
 </resources>
