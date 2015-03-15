@@ -27,6 +27,8 @@ public class MainActivity extends ActionBarActivity {
     private Integer currentPosition;
     private Boolean isStorage;
 
+    private SoldItem currentItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +61,15 @@ public class MainActivity extends ActionBarActivity {
         } else {
             soldItemEditor = new SoldItemEditor();
 
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("currentItem", currentItem);
+
+            soldItemEditor.setArguments(bundle);
+
             fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.fragmentFrame, soldItemEditor);
             fragmentTransaction.commit();
-            isStorage = true;
+            isStorage = false;
         }
     }
 
@@ -77,6 +84,11 @@ public class MainActivity extends ActionBarActivity {
         if (savedInstanceState.get("items") != null) {
             testData = savedInstanceState.getParcelableArrayList("items");
         }
+
+        if (savedInstanceState.get("currentItem") != null) {
+            currentItem = savedInstanceState.getParcelable("currentItem");
+        }
+
         currentPosition = savedInstanceState.getInt("currentPosition");
     }
 
@@ -111,14 +123,18 @@ public class MainActivity extends ActionBarActivity {
             List<SoldItem> items = storageFragment.getItems();
             outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
             outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
-            //Todo проверить
-            getSupportFragmentManager().beginTransaction().
-                    remove(storageFragment).commit();
         }
+
         outState.putBoolean("isCreated", isCreated);
         outState.putBoolean("isStorage", isStorage);
 
         if (soldItemEditor != null) {
+            if (isStorage == null || !isStorage) {
+                currentItem = soldItemEditor.getCurrentItem();
+            }
+
+            outState.putParcelable("currentItem", currentItem);
+
             getSupportFragmentManager().beginTransaction().
                     remove(soldItemEditor).
                     commit();
