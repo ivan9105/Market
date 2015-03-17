@@ -1,5 +1,6 @@
 package parcsys.com;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -41,8 +42,13 @@ public class MainActivity extends ActionBarActivity {
             isCreated = true;
         }
 
-        //Todo test editor remove this item before
         isStorage = false;
+
+        Intent intent = getIntent();
+        if (intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
+                || intent.getStringExtra(SoldItemEditor.CANCEL) != null) ) {
+            isStorage = true;
+        }
 
         if (isStorage == null || isStorage) {
             storageFragment = new StorageFragment();

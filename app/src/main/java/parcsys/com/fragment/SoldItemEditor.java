@@ -1,5 +1,6 @@
 package parcsys.com.fragment;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,13 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
+import parcsys.com.MainActivity;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.marketfinal.R;
@@ -22,6 +26,8 @@ import parcsys.com.marketfinal.R;
 public class SoldItemEditor extends Fragment {
     private Spinner typeField;
     private EditText editTitle, editAmount, editPrice;
+
+    public static final String OK = "OK", CANCEL = "CANCEL";
 
     private SoldItem currentItem;
 
@@ -37,7 +43,63 @@ public class SoldItemEditor extends Fragment {
         initFields(view);
         setItem();
 
+        initActions(view);
+
         return view;
+    }
+
+    private void initActions(View view) {
+        Button okButton = (Button) view.findViewById(R.id.btn_ok);
+        Button cancelButton = (Button) view.findViewById(R.id.btn_cancel);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateFields()) {
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra(OK, OK);
+                    getActivity().startActivity(intent);
+                }
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateFields()) {
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra(CANCEL, CANCEL);
+                    getActivity().startActivity(intent);
+                }
+            }
+        });
+    }
+
+    private boolean validateFields() {
+        boolean res = true;
+        StringBuilder sb = new StringBuilder();
+
+        if (editTitle.getText() == null || editTitle.getText().toString().equals("")) {
+            sb.append("Title field can't be null").append("\n");
+            res = false;
+        }
+
+        if (editAmount.getText() == null || editAmount.getText().toString().equals("")) {
+            sb.append("Amount field can't be null").append("\n");
+            res = false;
+        }
+
+        if (editPrice.getText() == null || editPrice.getText().toString().equals("")) {
+            sb.append("Price field can't be null").append("\n");
+            res = false;
+        }
+
+        if (!res) {
+            Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 
     private void setItem() {
