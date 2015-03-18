@@ -1,5 +1,7 @@
 package parcsys.com.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -78,28 +81,52 @@ public class SoldItemEditor extends Fragment {
     private boolean validateFields() {
         boolean res = true;
         StringBuilder sb = new StringBuilder();
+        sb.append("Fields: ");
 
         if (editTitle.getText() == null || editTitle.getText().toString().equals("")) {
-            sb.append("Title field can't be null").append("\n");
+            sb.append("title, ");
             res = false;
         }
 
         if (editAmount.getText() == null || editAmount.getText().toString().equals("")) {
-            sb.append("Amount field can't be null").append("\n");
+            sb.append("amount, ");
             res = false;
         }
 
         if (editPrice.getText() == null || editPrice.getText().toString().equals("")) {
-            sb.append("Price field can't be null").append("\n");
+            sb.append("price, ");
             res = false;
         }
 
         if (!res) {
-            Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_LONG).show();
+            String message = sb.toString();
+            message = message.substring(0, message.lastIndexOf(", "));
+            message = String.format("%s %s", message, "can't be empty");
+            createDialog(message);
             return false;
         }
 
         return true;
+    }
+
+    private void createDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(message)
+        .setCancelable(false).setNegativeButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(alert.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+        alert.getWindow().setAttributes(lp);
     }
 
     private void setItem() {
