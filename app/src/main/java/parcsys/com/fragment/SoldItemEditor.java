@@ -7,6 +7,9 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,7 @@ import parcsys.com.MainActivity;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.marketfinal.R;
+import parcsys.com.utils.FormatterHelper;
 
 public class SoldItemEditor extends Fragment {
     private Spinner typeField;

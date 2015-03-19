@@ -24,6 +24,7 @@ import java.util.Set;
 
 import parcsys.com.entity.SoldItem;
 import parcsys.com.marketfinal.R;
+import parcsys.com.utils.FormatterHelper;
 
 /**
  * Created by Иван on 25.01.2015.
@@ -61,7 +62,7 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
             titleText = titleText.substring(0, 60) + "...";
         }
         ((TextView) view.findViewById(R.id.soldTitleField)).setText(titleText);
-        ((TextView) view.findViewById(R.id.soldPriceField)).setText(doubleFormat(item.getPrice()));
+        ((TextView) view.findViewById(R.id.soldPriceField)).setText(FormatterHelper.doubleFormat(item.getPrice()));
         ((TextView) view.findViewById(R.id.soldAmountField)).setText(String.valueOf(item.getAmount()));
         ((TextView) view.findViewById(R.id.typeField)).setText("Type: " + item.getType().getId());
 
@@ -69,11 +70,6 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         buttonBuy.setOnClickListener(new BuyOnClickListener(position, view));
 
         return view;
-    }
-
-    private String doubleFormat(double price) {
-        DecimalFormat formatter = new DecimalFormat("0.00");
-        return formatter.format(price);
     }
 
     public List<SoldItem> getItems() {
