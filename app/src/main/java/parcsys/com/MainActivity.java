@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewConfiguration;
 import android.widget.Toast;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +23,8 @@ import parcsys.com.marketfinal.R;
 
 
 public class MainActivity extends ActionBarActivity {
+    public static final String TAG = "tag";
+
     private FragmentTransaction fragmentTransaction;
     private StorageFragment storageFragment;
     private SoldItemEditor soldItemEditor;
@@ -41,8 +46,6 @@ public class MainActivity extends ActionBarActivity {
             addTestData();
             isCreated = true;
         }
-
-        isStorage = false;
 
         Intent intent = getIntent();
         if (intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
@@ -77,10 +80,17 @@ public class MainActivity extends ActionBarActivity {
             fragmentTransaction.commit();
             isStorage = false;
         }
+
+        makeActionOverflowMenuShown();
     }
 
     private void restoreData(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null || isStorage != null && !isStorage) {
+            Intent intent = getIntent();
+            if (intent.getStringExtra(SoldItemEditor.OK) != null) {
+                currentItem = intent.getParcelableExtra("currentItem");
+                testData.add(currentItem);
+            }
             return;
         }
 
@@ -113,6 +123,9 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(this, "card", Toast.LENGTH_SHORT)
                         .show();
                 break;
+            case R.id.addItem:
+                Toast.makeText(this, "Add item", Toast.LENGTH_SHORT)
+                        .show();
             default:
                 break;
         }
@@ -139,7 +152,9 @@ public class MainActivity extends ActionBarActivity {
                 currentItem = soldItemEditor.getCurrentItem();
             }
 
-            outState.putParcelable("currentItem", currentItem);
+            if (currentItem != null) {
+                outState.putParcelable("currentItem", currentItem);
+            }
 
             getSupportFragmentManager().beginTransaction().
                     remove(soldItemEditor).
@@ -181,5 +196,19 @@ public class MainActivity extends ActionBarActivity {
         item.setType(type);
 
         return item;
+    }
+
+    private void makeActionOverflowMenuShown() {
+        //devices with hardware menu button (e.g. Samsung Note) don't show action overflow menu
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getLocalizedMessage());
+        }
     }
 }

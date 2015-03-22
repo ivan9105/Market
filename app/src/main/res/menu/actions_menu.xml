@@ -7,4 +7,8 @@
         market_app:showAsAction="ifRoom"
         android:title="@string/card"/>
 
+    <item
+        android:id="@+id/addItem"
+        android:title="@string/addItem"
+        market_app:showAsAction="never"/>
 </menu>

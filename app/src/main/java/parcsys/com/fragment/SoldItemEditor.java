@@ -5,11 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +17,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 import parcsys.com.MainActivity;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.marketfinal.R;
-import parcsys.com.utils.FormatterHelper;
 
 public class SoldItemEditor extends Fragment {
     private Spinner typeField;
@@ -37,6 +34,8 @@ public class SoldItemEditor extends Fragment {
     public static final String OK = "OK", CANCEL = "CANCEL";
 
     private SoldItem currentItem;
+
+    private boolean isCancel = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,7 +64,8 @@ public class SoldItemEditor extends Fragment {
                 if (validateFields()) {
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(OK, OK);
-                    getActivity().startActivity(intent);
+                    intent.putExtra("currentItem", getCurrentItem());
+                    startActivity(intent);
                 }
             }
         });
@@ -73,11 +73,10 @@ public class SoldItemEditor extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validateFields()) {
+                    isCancel = true;
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(CANCEL, CANCEL);
-                    getActivity().startActivity(intent);
-                }
+                    startActivity(intent);
             }
         });
     }
@@ -177,6 +176,9 @@ public class SoldItemEditor extends Fragment {
     }
 
     public SoldItem getCurrentItem() {
+        if (isCancel) {
+            return null;
+        }
         return getItem();
     }
 
