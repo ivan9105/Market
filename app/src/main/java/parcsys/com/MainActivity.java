@@ -151,7 +151,8 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(this, "Add item", Toast.LENGTH_SHORT)
                         .show();
                 isClear = true;
-                recreate();
+                storageFragment = null;
+                createEditor();
             default:
                 break;
         }
@@ -172,6 +173,7 @@ public class MainActivity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction().
                     remove(storageFragment).
                     commit();
+            storageFragment = null;
         }
 
         outState.putBoolean("isCreated", isCreated);
@@ -190,6 +192,7 @@ public class MainActivity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction().
                     remove(soldItemEditor).
                     commit();
+            soldItemEditor = null;
         }
 
         super.onSaveInstanceState(outState);
