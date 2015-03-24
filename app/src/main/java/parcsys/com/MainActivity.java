@@ -32,6 +32,7 @@ public class MainActivity extends ActionBarActivity {
     private Boolean isCreated;
     private Integer currentPosition;
     private Boolean isStorage;
+    private Boolean isClear;
 
     private SoldItem currentItem;
 
@@ -45,11 +46,12 @@ public class MainActivity extends ActionBarActivity {
         if (isCreated == null) {
             addTestData();
             isCreated = true;
+            isClear = false;
         }
 
         Intent intent = getIntent();
-        if (intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
-                || intent.getStringExtra(SoldItemEditor.CANCEL) != null) ) {
+        if (!isClear && intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
+                || intent.getStringExtra(SoldItemEditor.CANCEL) != null)) {
             isStorage = true;
         }
 
@@ -61,12 +63,18 @@ public class MainActivity extends ActionBarActivity {
                 bundle.putInt("currentPosition", currentPosition);
             }
             storageFragment.setArguments(bundle);
-            soldItemEditor = new SoldItemEditor();
 
-            fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
-            fragmentTransaction.commit();
+            if (!isClear) {
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
+                fragmentTransaction.commit();
+            } else {
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragmentFrame, storageFragment);
+                fragmentTransaction.commit();
+            }
             isStorage = true;
+            isClear = false;
         } else {
             soldItemEditor = new SoldItemEditor();
 
@@ -76,8 +84,9 @@ public class MainActivity extends ActionBarActivity {
             soldItemEditor.setArguments(bundle);
 
             fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragmentFrame, soldItemEditor);
+            fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
             fragmentTransaction.commit();
+
             isStorage = false;
         }
 
@@ -96,6 +105,7 @@ public class MainActivity extends ActionBarActivity {
 
         isStorage = (Boolean) savedInstanceState.get("isStorage");
         isCreated = (Boolean) savedInstanceState.get("isCreated");
+        isClear = (Boolean) savedInstanceState.get("isClear");
 
         if (savedInstanceState.get("items") != null) {
             testData = savedInstanceState.getParcelableArrayList("items");
@@ -124,8 +134,11 @@ public class MainActivity extends ActionBarActivity {
                         .show();
                 break;
             case R.id.addItem:
+                isStorage = false;
                 Toast.makeText(this, "Add item", Toast.LENGTH_SHORT)
                         .show();
+                isClear = true;
+                recreate();
             default:
                 break;
         }
@@ -142,10 +155,15 @@ public class MainActivity extends ActionBarActivity {
             List<SoldItem> items = storageFragment.getItems();
             outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
             outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
+
+            getSupportFragmentManager().beginTransaction().
+                    remove(storageFragment).
+                    commit();
         }
 
         outState.putBoolean("isCreated", isCreated);
         outState.putBoolean("isStorage", isStorage);
+        outState.putBoolean("isClear", isClear);
 
         if (soldItemEditor != null) {
             if (isStorage == null || !isStorage) {
