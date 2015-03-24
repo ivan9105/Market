@@ -1,8 +1,10 @@
 package parcsys.com;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -34,6 +36,7 @@ public class MainActivity extends ActionBarActivity {
     private Integer currentPosition;
     private Boolean isStorage;
     private Boolean isClear;
+    private Boolean onUserLeaveHint;
 
     private SoldItem currentItem;
 
@@ -161,6 +164,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onUserLeaveHint() {
+        onUserLeaveHint = true;
+        super.onUserLeaveHint();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState == null) {
             outState = new Bundle();
@@ -170,10 +179,12 @@ public class MainActivity extends ActionBarActivity {
             outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
             outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
 
-            getSupportFragmentManager().beginTransaction().
-                    remove(storageFragment).
-                    commit();
-            storageFragment = null;
+            if (onUserLeaveHint == null) {
+                getSupportFragmentManager().beginTransaction().
+                        remove(storageFragment).
+                        commit();
+                storageFragment = null;
+            }
         }
 
         outState.putBoolean("isCreated", isCreated);
@@ -181,7 +192,7 @@ public class MainActivity extends ActionBarActivity {
         outState.putBoolean("isClear", isClear);
 
         if (soldItemEditor != null) {
-            if (isStorage == null || !isStorage) {
+            if ((isStorage == null || !isStorage) && onUserLeaveHint == null) {
                 currentItem = soldItemEditor.getCurrentItem();
             }
 
@@ -189,13 +200,24 @@ public class MainActivity extends ActionBarActivity {
                 outState.putParcelable("currentItem", currentItem);
             }
 
-            getSupportFragmentManager().beginTransaction().
-                    remove(soldItemEditor).
-                    commit();
-            soldItemEditor = null;
+            if (onUserLeaveHint == null) {
+                getSupportFragmentManager().beginTransaction().
+                        remove(soldItemEditor).
+                        commit();
+                soldItemEditor = null;
+            }
         }
 
         super.onSaveInstanceState(outState);
+    }
+
+    public Bundle createBundle(@Nullable Bundle bundle) {
+        if (bundle == null) {
+            bundle = new Bundle();
+        }
+
+
+        return bundle;
     }
 
     private void addTestData() {
@@ -244,5 +266,9 @@ public class MainActivity extends ActionBarActivity {
         } catch (Exception e) {
             Log.d(TAG, e.getLocalizedMessage());
         }
+    }
+
+    private int getCurrentOrientation() {
+        return getResources().getConfiguration().orientation;
     }
 }
