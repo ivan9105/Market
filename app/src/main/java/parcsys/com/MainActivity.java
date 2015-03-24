@@ -2,6 +2,7 @@ package parcsys.com;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -49,48 +50,60 @@ public class MainActivity extends ActionBarActivity {
             isClear = false;
         }
 
+        checkIsStorage();
+
+        if (isStorage == null || isStorage) {
+            createStorage();
+        } else {
+            createEditor();
+        }
+
+        makeActionOverflowMenuShown();
+    }
+
+    private void checkIsStorage() {
         Intent intent = getIntent();
         if (!isClear && intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
                 || intent.getStringExtra(SoldItemEditor.CANCEL) != null)) {
             isStorage = true;
         }
+    }
 
-        if (isStorage == null || isStorage) {
-            storageFragment = new StorageFragment();
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("items", (ArrayList<? extends android.os.Parcelable>) testData);
-            if (currentPosition != null) {
-                bundle.putInt("currentPosition", currentPosition);
-            }
-            storageFragment.setArguments(bundle);
-
-            if (!isClear) {
-                fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
-                fragmentTransaction.commit();
-            } else {
-                fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragmentFrame, storageFragment);
-                fragmentTransaction.commit();
-            }
-            isStorage = true;
-            isClear = false;
-        } else {
-            soldItemEditor = new SoldItemEditor();
-
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("currentItem", currentItem);
-
-            soldItemEditor.setArguments(bundle);
-
-            fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
-            fragmentTransaction.commit();
-
-            isStorage = false;
+    private void createStorage() {
+        storageFragment = new StorageFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) testData);
+        if (currentPosition != null) {
+            bundle.putInt("currentPosition", currentPosition);
         }
+        storageFragment.setArguments(bundle);
 
-        makeActionOverflowMenuShown();
+        if (!isClear) {
+            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
+            fragmentTransaction.commit();
+        } else {
+            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragmentFrame, storageFragment);
+            fragmentTransaction.commit();
+        }
+        isStorage = true;
+        isClear = false;
+    }
+
+    private void createEditor() {
+        soldItemEditor = new SoldItemEditor();
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("currentItem", currentItem);
+
+        soldItemEditor.setArguments(bundle);
+
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
+        fragmentTransaction.commit();
+
+        isStorage = false;
     }
 
     private void restoreData(Bundle savedInstanceState) {
