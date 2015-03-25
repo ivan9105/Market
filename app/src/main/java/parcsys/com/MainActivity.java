@@ -97,7 +97,7 @@ public class MainActivity extends ActionBarActivity {
     private void createEditor() {
         soldItemEditor = new SoldItemEditor();
 
-        Bundle bundle = new Bundle();
+        Bundle bundle = createBundle(null, true);
         bundle.putParcelable("currentItem", currentItem);
 
         soldItemEditor.setArguments(bundle);
@@ -174,32 +174,17 @@ public class MainActivity extends ActionBarActivity {
         if (outState == null) {
             outState = new Bundle();
         }
-        if (storageFragment != null) {
-            List<SoldItem> items = storageFragment.getItems();
-            outState.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
-            outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
 
-            if (onUserLeaveHint == null) {
-                getSupportFragmentManager().beginTransaction().
-                        remove(storageFragment).
-                        commit();
-                storageFragment = null;
-            }
+        createBundle(outState, false);
+
+        if (storageFragment != null && onUserLeaveHint == null) {
+            getSupportFragmentManager().beginTransaction().
+                    remove(storageFragment).
+                    commit();
+            storageFragment = null;
         }
 
-        outState.putBoolean("isCreated", isCreated);
-        outState.putBoolean("isStorage", isStorage);
-        outState.putBoolean("isClear", isClear);
-
         if (soldItemEditor != null) {
-            if ((isStorage == null || !isStorage) && onUserLeaveHint == null) {
-                currentItem = soldItemEditor.getCurrentItem();
-            }
-
-            if (currentItem != null) {
-                outState.putParcelable("currentItem", currentItem);
-            }
-
             if (onUserLeaveHint == null) {
                 getSupportFragmentManager().beginTransaction().
                         remove(soldItemEditor).
@@ -211,11 +196,31 @@ public class MainActivity extends ActionBarActivity {
         super.onSaveInstanceState(outState);
     }
 
-    public Bundle createBundle(@Nullable Bundle bundle) {
+    public Bundle createBundle(@Nullable Bundle bundle, boolean isEditorUsed) {
         if (bundle == null) {
             bundle = new Bundle();
         }
+        if (storageFragment != null) {
+            List<SoldItem> items = storageFragment.getItems();
+            bundle.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
+            bundle.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
+        } else {
+            bundle.putParcelableArrayList("items", (ArrayList<SoldItem>) testData);
+        }
 
+        bundle.putBoolean("isCreated", isCreated);
+        bundle.putBoolean("isStorage", isStorage);
+        bundle.putBoolean("isClear", isClear);
+
+        if (soldItemEditor != null && !isEditorUsed) {
+            if ((isStorage == null || !isStorage) && onUserLeaveHint == null) {
+                currentItem = soldItemEditor.getCurrentItem();
+            }
+
+            if (currentItem != null && onUserLeaveHint == null) {
+                bundle.putParcelable("currentItem", currentItem);
+            }
+        }
 
         return bundle;
     }
