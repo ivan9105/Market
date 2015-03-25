@@ -68,7 +68,16 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = getIntent();
         if (!isClear && intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
                 || intent.getStringExtra(SoldItemEditor.CANCEL) != null)) {
+            restoreData(intent.getExtras());
             isStorage = true;
+            currentItem = intent.getExtras().getParcelable("currentItem");
+            if (currentItem != null) {
+                //skip logic of adding - it simple
+                testData.add(currentItem);
+                intent.removeExtra("currentItem");
+            }
+            intent.removeExtra(SoldItemEditor.OK);
+            intent.removeExtra(SoldItemEditor.CANCEL);
         }
     }
 

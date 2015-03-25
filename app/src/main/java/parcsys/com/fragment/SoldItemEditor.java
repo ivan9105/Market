@@ -20,6 +20,7 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import parcsys.com.MainActivity;
@@ -65,6 +66,8 @@ public class SoldItemEditor extends Fragment {
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(OK, OK);
                     intent.putExtra("currentItem", getCurrentItem());
+
+                    fillIntent(intent);
                     startActivity(intent);
                 }
             }
@@ -73,12 +76,24 @@ public class SoldItemEditor extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    isCancel = true;
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.putExtra(CANCEL, CANCEL);
-                    startActivity(intent);
+                isCancel = true;
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra(CANCEL, CANCEL);
+                fillIntent(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
+    }
+
+    private void fillIntent(Intent intent) {
+        Bundle arguments = getArguments();
+        intent.putExtra("isStorage", (Boolean) arguments.get("isStorage"));
+        intent.putExtra("isCreated", (Boolean) arguments.get("isCreated"));
+        intent.putExtra("isClear", (Boolean) arguments.get("isClear"));
+        ArrayList<SoldItem> items = (ArrayList<SoldItem>) arguments.get("items");
+        intent.putParcelableArrayListExtra("items", items);
+        intent.putExtra("currentPosition", (Integer) arguments.get("currentPosition"));
     }
 
     private boolean validateFields() {
@@ -115,7 +130,7 @@ public class SoldItemEditor extends Fragment {
     private void createDialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(message)
-        .setCancelable(false).setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                .setCancelable(false).setNegativeButton("Close", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
