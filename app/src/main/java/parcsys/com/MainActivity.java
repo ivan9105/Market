@@ -1,7 +1,7 @@
 package parcsys.com;
 
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -23,6 +23,7 @@ import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.fragment.SoldItemEditor;
 import parcsys.com.fragment.StorageFragment;
 import parcsys.com.marketfinal.R;
+import parcsys.com.utils.DBHelper;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -40,12 +41,18 @@ public class MainActivity extends ActionBarActivity {
 
     private SoldItem currentItem;
 
+    private DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        restoreData(savedInstanceState);
+        dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+
+        /*restoreData(savedInstanceState);
 
         if (isCreated == null) {
             addTestData();
@@ -61,7 +68,7 @@ public class MainActivity extends ActionBarActivity {
             createEditor();
         }
 
-        makeActionOverflowMenuShown();
+        makeActionOverflowMenuShown();*/
     }
 
     private void checkIsStorage() {
