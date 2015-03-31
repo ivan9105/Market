@@ -26,8 +26,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private String DB_DIRECTORY = "db";
 
-    public DBHelper(Context context) {
-        super(context, DB_NAME, null, 1);
+    public DBHelper(Context context, int DB_VERSION) {
+        super(context, DB_NAME, null, DB_VERSION);
         this.context = context;
     }
 
@@ -36,15 +36,24 @@ public class DBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
 
         try {
-            AssetManager assetManager = context.getAssets();
-            String[] fileList = assetManager.list(DB_DIRECTORY);
-
             db.execSQL("CREATE TABLE IF NOT EXISTS DB_LOG (" +
                     "CREATE_TS datetime," +
                     "CREATED_BY text," +
                     "SCRIPT_NAME text" +
                     ");");
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
 
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.beginTransaction();
+
+        try {
+            AssetManager assetManager = context.getAssets();
+            String[] fileList = assetManager.list(DB_DIRECTORY);
             for (String name : fileList) {
                 boolean isExist = true;
 
@@ -60,11 +69,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
                     try {
                         reader = new BufferedReader(new InputStreamReader
-                                  (context.getAssets().open(DB_DIRECTORY + File.separator + name)));
+                                (context.getAssets().open(DB_DIRECTORY + File.separator + name)));
                         StringBuilder sb = new StringBuilder();
                         String line;
                         while (((line = reader.readLine()) != null)) {
-                            sb.append(line);
+                            sb.append(line).append("\n");
                         }
                         script = sb.toString();
                     } catch (FileNotFoundException e) {
@@ -88,15 +97,11 @@ public class DBHelper extends SQLiteOpenHelper {
                     }
                 }
             }
+            db.setTransactionSuccessful();
         } catch (IOException e) {
             Log.i("dbtag", e.toString());
         } finally {
             db.endTransaction();
         }
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 }

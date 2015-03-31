@@ -43,12 +43,14 @@ public class MainActivity extends ActionBarActivity {
 
     private DBHelper dbHelper;
 
+    final int DB_VERSION = 5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        dbHelper = new DBHelper(this);
+        dbHelper = new DBHelper(this, DB_VERSION);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
 
