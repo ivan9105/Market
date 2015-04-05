@@ -35,14 +35,8 @@ public class MainActivity extends ActionBarActivity {
     private FragmentTransaction fragmentTransaction;
     private StorageFragment storageFragment;
     private SoldItemEditor soldItemEditor;
-    private List<SoldItem> testData = new ArrayList<SoldItem>();
-    //    private Boolean isCreated;
-//    private Integer currentPosition;
     private Boolean isStorage;
-    //    private Boolean isClear;
     private Boolean onUserLeaveHint;
-
-//    private SoldItem currentItem;
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
@@ -90,40 +84,6 @@ public class MainActivity extends ActionBarActivity {
         }
 
         makeActionOverflowMenuShown();
-        /*restoreData(savedInstanceState);
-
-        if (isCreated == null) {
-            addTestData();
-            isCreated = true;
-            isClear = false;
-        }
-
-        checkIsStorage();
-
-        if (isStorage == null || isStorage) {
-            createStorage();
-        } else {
-            createEditor();
-        }
-
-        makeActionOverflowMenuShown();*/
-    }
-
-    private void checkIsStorage() {
-//        Intent intent = getIntent();
-//        if (!isClear && intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
-//                || intent.getStringExtra(SoldItemEditor.CANCEL) != null)) {
-//            restoreData(intent.getExtras());
-//            isStorage = true;
-//            currentItem = intent.getExtras().getParcelable("currentItem");
-//            if (currentItem != null) {
-//                //skip logic of adding - it simple
-//                testData.add(currentItem);
-//                intent.removeExtra("currentItem");
-//            }
-//            intent.removeExtra(SoldItemEditor.OK);
-//            intent.removeExtra(SoldItemEditor.CANCEL);
-//        }
     }
 
     private void createStorage(Bundle savedInstanceState) {
@@ -141,23 +101,6 @@ public class MainActivity extends ActionBarActivity {
         fragmentTransaction.commit();
 
         isStorage = true;
-
-        /*if (currentPosition != null) {
-            bundle.putInt("currentPosition", currentPosition);
-        }
-        storageFragment.setArguments(bundle);
-
-        if (!isClear) {
-            fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
-            fragmentTransaction.commit();
-        } else {
-            fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragmentFrame, storageFragment);
-            fragmentTransaction.commit();
-        }
-        isStorage = true;
-        isClear = false;*/
     }
 
     private List<SoldItem> loadSoldItems() {
@@ -207,34 +150,10 @@ public class MainActivity extends ActionBarActivity {
             soldItemEditor.setArguments(bundle);
         }
 
+        clearFragmentStack();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
         fragmentTransaction.commit();
-    }
-
-    private void restoreData(Bundle savedInstanceState) {
-        if (savedInstanceState == null || isStorage != null && !isStorage) {
-            Intent intent = getIntent();
-//            if (intent.getStringExtra(SoldItemEditor.OK) != null) {
-//                currentItem = intent.getParcelableExtra("currentItem");
-//                testData.add(currentItem);
-//            }
-            return;
-        }
-
-        isStorage = (Boolean) savedInstanceState.get("isStorage");
-//        isCreated = (Boolean) savedInstanceState.get("isCreated");
-//        isClear = (Boolean) savedInstanceState.get("isClear");
-//
-//        if (savedInstanceState.get("items") != null) {
-//            testData = savedInstanceState.getParcelableArrayList("items");
-//        }
-//
-//        if (savedInstanceState.get("currentItem") != null) {
-//            currentItem = savedInstanceState.getParcelable("currentItem");
-//        }
-//
-//        currentPosition = savedInstanceState.getInt("currentPosition");
     }
 
     @Override
@@ -306,67 +225,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         outState.putBoolean("isStorage", isStorage);
-
-//        outState.putBoolean("isCreated", isCreated);
-        /*createBundle(outState, false);
-
-        if (storageFragment != null && onUserLeaveHint == null) {
-            getSupportFragmentManager().beginTransaction().
-                    remove(storageFragment).
-                    commit();
-            storageFragment = null;
-        }
-
-        if (soldItemEditor != null) {
-            if (onUserLeaveHint == null) {
-                getSupportFragmentManager().beginTransaction().
-                        remove(soldItemEditor).
-                        commit();
-                soldItemEditor = null;
-            }
-        }*/
-
-            super.onSaveInstanceState(outState);
-        }
-
-    public Bundle createBundle(@Nullable Bundle bundle, boolean isEditorUsed) {
-        if (bundle == null) {
-            bundle = new Bundle();
-        }
-        if (storageFragment != null) {
-            List<SoldItem> items = storageFragment.getItems();
-            bundle.putParcelableArrayList("items", (ArrayList<SoldItem>) items);
-            bundle.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
-        } else {
-            bundle.putParcelableArrayList("items", (ArrayList<SoldItem>) testData);
-        }
-
-//        bundle.putBoolean("isCreated", isCreated);
-//        bundle.putBoolean("isStorage", isStorage);
-//        bundle.putBoolean("isClear", isClear);
-//
-//        if (soldItemEditor != null && !isEditorUsed) {
-//            if ((isStorage == null || !isStorage) && onUserLeaveHint == null) {
-//                currentItem = soldItemEditor.getCurrentItem();
-//            }
-//
-//            if (currentItem != null && onUserLeaveHint == null) {
-//                bundle.putParcelable("currentItem", currentItem);
-//            }
-//        }
-
-        return bundle;
-    }
-
-    private SoldItem createItem(String title, SoldDestinationType type, double price, int amount) {
-        SoldItem item = new SoldItem();
-        item.setId(UUID.randomUUID());
-        item.setTitle(title);
-        item.setPrice(price);
-        item.setAmount(amount);
-        item.setType(type);
-
-        return item;
+        super.onSaveInstanceState(outState);
     }
 
     private void makeActionOverflowMenuShown() {
@@ -383,7 +242,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private int getCurrentOrientation() {
-        return getResources().getConfiguration().orientation;
+    public void deleteSoldItem() {
+        //Todo
+    }
+
+    public void updateSoldItem() {
+        //Todo
     }
 }
