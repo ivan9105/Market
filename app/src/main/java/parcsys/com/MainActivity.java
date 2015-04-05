@@ -1,6 +1,7 @@
 package parcsys.com;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -42,8 +43,9 @@ public class MainActivity extends ActionBarActivity {
     private SoldItem currentItem;
 
     private DBHelper dbHelper;
+    private SQLiteDatabase db;
 
-    final int DB_VERSION = 5;
+    final int DB_VERSION = 8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +53,9 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.main);
 
         dbHelper = new DBHelper(this, DB_VERSION);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db = dbHelper.getWritableDatabase();
 
-
+        createStorage();
         /*restoreData(savedInstanceState);
 
         if (isCreated == null) {
@@ -93,8 +95,10 @@ public class MainActivity extends ActionBarActivity {
     private void createStorage() {
         storageFragment = new StorageFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) testData);
-        if (currentPosition != null) {
+        List<SoldItem> soldItems = loadSoldItems();
+        bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) soldItems);
+
+        /*if (currentPosition != null) {
             bundle.putInt("currentPosition", currentPosition);
         }
         storageFragment.setArguments(bundle);
@@ -109,7 +113,46 @@ public class MainActivity extends ActionBarActivity {
             fragmentTransaction.commit();
         }
         isStorage = true;
-        isClear = false;
+        isClear = false;*/
+    }
+
+    private List<SoldItem> loadSoldItems() {
+        List<SoldItem> items = new ArrayList<SoldItem>();
+
+        db.beginTransaction();
+        try {
+            Cursor cursor = db.query("SOLD_ITEM_TABLE", new String[] {"ID", "TITLE", "AMOUNT", "PRICE", "TYPE"}, null, null, null, null, null);
+            //Todo разобраться почему добавилась только одна запись возможно execSql не отрабатывает посмотреть что добавилось
+
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    String id = cursor.getString(cursor.getColumnIndex("ID"));
+                    String title = cursor.getString(cursor.getColumnIndex("TITLE"));
+                    Integer amount = cursor.getInt(cursor.getColumnIndex("AMOUNT"));
+                    Double price = cursor.getDouble(cursor.getColumnIndex("PRICE"));
+                    String type = cursor.getString(cursor.getColumnIndex("TYPE"));
+
+                    SoldItem soldItem = new SoldItem();
+                    soldItem.setId(UUID.fromString(id));
+                    soldItem.setType(SoldDestinationType.getById(type));
+                    soldItem.setAmount(amount);
+                    soldItem.setTitle(title);
+                    soldItem.setPrice(price);
+
+                    items.add(soldItem);
+
+                    cursor.moveToNext();
+                }
+            }
+
+            cursor.close();
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return items;
     }
 
     private void createEditor() {
@@ -193,7 +236,8 @@ public class MainActivity extends ActionBarActivity {
             outState = new Bundle();
         }
 
-        createBundle(outState, false);
+//        outState.putBoolean("isCreated", isCreated);
+        /*createBundle(outState, false);
 
         if (storageFragment != null && onUserLeaveHint == null) {
             getSupportFragmentManager().beginTransaction().
@@ -209,7 +253,7 @@ public class MainActivity extends ActionBarActivity {
                         commit();
                 soldItemEditor = null;
             }
-        }
+        }*/
 
         super.onSaveInstanceState(outState);
     }

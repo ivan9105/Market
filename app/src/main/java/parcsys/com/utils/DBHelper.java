@@ -73,7 +73,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         StringBuilder sb = new StringBuilder();
                         String line;
                         while (((line = reader.readLine()) != null)) {
-                            sb.append(line).append("\n");
+                            sb.append(line);
                         }
                         script = sb.toString();
                     } catch (FileNotFoundException e) {
@@ -85,7 +85,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     }
 
                     if (script != null && !script.equals("")) {
-                        db.execSQL(script);
+                        String[] scriptItems = script.split("\\^");
+                        for (String scriptItem : scriptItems) {
+                            db.execSQL(scriptItem);
+                        }
 
                         ContentValues cv = new ContentValues();
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
