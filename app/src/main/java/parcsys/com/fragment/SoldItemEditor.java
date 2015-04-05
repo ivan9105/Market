@@ -67,7 +67,7 @@ public class SoldItemEditor extends Fragment {
                     intent.putExtra(OK, OK);
                     intent.putExtra("currentItem", getCurrentItem());
 
-                    fillIntent(intent);
+//                    fillIntent(intent);
                     startActivity(intent);
                 }
             }
@@ -79,7 +79,7 @@ public class SoldItemEditor extends Fragment {
                 isCancel = true;
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra(CANCEL, CANCEL);
-                fillIntent(intent);
+//                fillIntent(intent);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
@@ -148,8 +148,8 @@ public class SoldItemEditor extends Fragment {
     }
 
     private void setItem() {
-        currentItem = getArguments().getParcelable("currentItem");
-        if (currentItem != null) {
+        if (getArguments() != null && getArguments().getParcelable("currentItem") != null) {
+            currentItem = getArguments().getParcelable("currentItem");
             editTitle.setText(currentItem.getTitle());
             editAmount.setText(currentItem.getAmount() == null ? "" : String.valueOf(currentItem.getAmount()));
             editPrice.setText(currentItem.getPrice() == null ? "" : String.valueOf(currentItem.getPrice()));

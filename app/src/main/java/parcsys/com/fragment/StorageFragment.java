@@ -21,7 +21,6 @@ import parcsys.com.marketfinal.R;
  * Created by Иван on 25.01.2015.
  */
 public class StorageFragment extends ListFragment {
-    List<SoldItem> items;
     private SoldItemAdapter adapter;
 
     public StorageFragment() {
@@ -46,9 +45,7 @@ public class StorageFragment extends ListFragment {
         setListAdapter(adapter);
 
         int currentPosition = getArguments().getInt("currentPosition");
-        if (currentPosition != 0) {
-            getListView().setVerticalScrollbarPosition(currentPosition);
-        }
+        getListView().setSelection(currentPosition);
     }
 
     private int getCurrentOrientation() {

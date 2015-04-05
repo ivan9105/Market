@@ -71,8 +71,17 @@ public class SoldItem implements Parcelable{
                 String.valueOf(id),
                 title,
                 type});
-        dest.writeInt(amount);
-        dest.writeDouble(price);
+        if (amount != null) {
+            dest.writeInt(amount);
+        } else {
+            dest.writeInt(-1);
+        }
+
+        if (price != null) {
+            dest.writeDouble(price);
+        } else {
+            dest.writeDouble(-1);
+        }
     }
 
     public static final Creator<SoldItem> CREATOR = new Creator<SoldItem>() {
@@ -95,7 +104,19 @@ public class SoldItem implements Parcelable{
         }
         this.title = data[1];
         this.type = data[2];
-        this.amount = parcel.readInt();
-        this.price = parcel.readDouble();
+
+        int amountFromParcel = parcel.readInt();
+        if (amountFromParcel == -1) {
+            this.amount = null;
+        } else {
+            this.amount = amountFromParcel;
+        }
+
+        double priceFromParcel = parcel.readDouble();
+        if (priceFromParcel == -1) {
+            this.price = null;
+        } else {
+            this.price = priceFromParcel;
+        }
     }
 }

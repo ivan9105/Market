@@ -1,11 +1,13 @@
 package parcsys.com;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -34,13 +36,13 @@ public class MainActivity extends ActionBarActivity {
     private StorageFragment storageFragment;
     private SoldItemEditor soldItemEditor;
     private List<SoldItem> testData = new ArrayList<SoldItem>();
-    private Boolean isCreated;
-    private Integer currentPosition;
+    //    private Boolean isCreated;
+//    private Integer currentPosition;
     private Boolean isStorage;
-    private Boolean isClear;
+    //    private Boolean isClear;
     private Boolean onUserLeaveHint;
 
-    private SoldItem currentItem;
+//    private SoldItem currentItem;
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
@@ -55,7 +57,39 @@ public class MainActivity extends ActionBarActivity {
         dbHelper = new DBHelper(this, DB_VERSION);
         db = dbHelper.getWritableDatabase();
 
-        createStorage();
+        if (savedInstanceState != null) {
+            isStorage = (Boolean) savedInstanceState.get("isStorage");
+        } else {
+            Intent intent = getIntent();
+            if (intent != null && intent.getStringExtra(SoldItemEditor.OK) != null) {
+                SoldItem soldItem = intent.getParcelableExtra("currentItem");
+
+                ContentValues cv = new ContentValues();
+                cv.put("ID", soldItem.getId().toString());
+                cv.put("AMOUNT", soldItem.getAmount());
+                cv.put("PRICE", soldItem.getPrice());
+                cv.put("TYPE", soldItem.getType().getId());
+                cv.put("TITLE", soldItem.getTitle());
+
+                db.beginTransaction();
+                try {
+                    db.insert("SOLD_ITEM_TABLE", null, cv);
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                setIntent(null);
+            }
+        }
+
+        if (isStorage == null || isStorage) {
+            createStorage(savedInstanceState);
+        } else {
+            createEditor(savedInstanceState);
+        }
+
+        makeActionOverflowMenuShown();
         /*restoreData(savedInstanceState);
 
         if (isCreated == null) {
@@ -76,27 +110,37 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void checkIsStorage() {
-        Intent intent = getIntent();
-        if (!isClear && intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
-                || intent.getStringExtra(SoldItemEditor.CANCEL) != null)) {
-            restoreData(intent.getExtras());
-            isStorage = true;
-            currentItem = intent.getExtras().getParcelable("currentItem");
-            if (currentItem != null) {
-                //skip logic of adding - it simple
-                testData.add(currentItem);
-                intent.removeExtra("currentItem");
-            }
-            intent.removeExtra(SoldItemEditor.OK);
-            intent.removeExtra(SoldItemEditor.CANCEL);
-        }
+//        Intent intent = getIntent();
+//        if (!isClear && intent != null && (intent.getStringExtra(SoldItemEditor.OK) != null
+//                || intent.getStringExtra(SoldItemEditor.CANCEL) != null)) {
+//            restoreData(intent.getExtras());
+//            isStorage = true;
+//            currentItem = intent.getExtras().getParcelable("currentItem");
+//            if (currentItem != null) {
+//                //skip logic of adding - it simple
+//                testData.add(currentItem);
+//                intent.removeExtra("currentItem");
+//            }
+//            intent.removeExtra(SoldItemEditor.OK);
+//            intent.removeExtra(SoldItemEditor.CANCEL);
+//        }
     }
 
-    private void createStorage() {
+    private void createStorage(Bundle savedInstanceState) {
         storageFragment = new StorageFragment();
         Bundle bundle = new Bundle();
         List<SoldItem> soldItems = loadSoldItems();
+        if (savedInstanceState != null && savedInstanceState.get("currentPosition") != null) {
+            bundle.putInt("currentPosition", (Integer) savedInstanceState.get("currentPosition"));
+        }
         bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) soldItems);
+        storageFragment.setArguments(bundle);
+
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
+        fragmentTransaction.commit();
+
+        isStorage = true;
 
         /*if (currentPosition != null) {
             bundle.putInt("currentPosition", currentPosition);
@@ -121,8 +165,7 @@ public class MainActivity extends ActionBarActivity {
 
         db.beginTransaction();
         try {
-            Cursor cursor = db.query("SOLD_ITEM_TABLE", new String[] {"ID", "TITLE", "AMOUNT", "PRICE", "TYPE"}, null, null, null, null, null);
-            //Todo разобраться почему добавилась только одна запись возможно execSql не отрабатывает посмотреть что добавилось
+            Cursor cursor = db.query("SOLD_ITEM_TABLE", new String[]{"ID", "TITLE", "AMOUNT", "PRICE", "TYPE"}, null, null, null, null, null);
 
             if (cursor.moveToFirst()) {
                 while (!cursor.isAfterLast()) {
@@ -155,44 +198,43 @@ public class MainActivity extends ActionBarActivity {
         return items;
     }
 
-    private void createEditor() {
+    private void createEditor(@Nullable Bundle savedInstanceState) {
         soldItemEditor = new SoldItemEditor();
 
-        Bundle bundle = createBundle(null, true);
-        bundle.putParcelable("currentItem", currentItem);
-
-        soldItemEditor.setArguments(bundle);
+        if (savedInstanceState != null && savedInstanceState.get("currentItem") != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("currentItem", (Parcelable) savedInstanceState.get("currentItem"));
+            soldItemEditor.setArguments(bundle);
+        }
 
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
         fragmentTransaction.commit();
-
-        isStorage = false;
     }
 
     private void restoreData(Bundle savedInstanceState) {
         if (savedInstanceState == null || isStorage != null && !isStorage) {
             Intent intent = getIntent();
-            if (intent.getStringExtra(SoldItemEditor.OK) != null) {
-                currentItem = intent.getParcelableExtra("currentItem");
-                testData.add(currentItem);
-            }
+//            if (intent.getStringExtra(SoldItemEditor.OK) != null) {
+//                currentItem = intent.getParcelableExtra("currentItem");
+//                testData.add(currentItem);
+//            }
             return;
         }
 
         isStorage = (Boolean) savedInstanceState.get("isStorage");
-        isCreated = (Boolean) savedInstanceState.get("isCreated");
-        isClear = (Boolean) savedInstanceState.get("isClear");
-
-        if (savedInstanceState.get("items") != null) {
-            testData = savedInstanceState.getParcelableArrayList("items");
-        }
-
-        if (savedInstanceState.get("currentItem") != null) {
-            currentItem = savedInstanceState.getParcelable("currentItem");
-        }
-
-        currentPosition = savedInstanceState.getInt("currentPosition");
+//        isCreated = (Boolean) savedInstanceState.get("isCreated");
+//        isClear = (Boolean) savedInstanceState.get("isClear");
+//
+//        if (savedInstanceState.get("items") != null) {
+//            testData = savedInstanceState.getParcelableArrayList("items");
+//        }
+//
+//        if (savedInstanceState.get("currentItem") != null) {
+//            currentItem = savedInstanceState.getParcelable("currentItem");
+//        }
+//
+//        currentPosition = savedInstanceState.getInt("currentPosition");
     }
 
     @Override
@@ -212,16 +254,25 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case R.id.addItem:
                 isStorage = false;
+                storageFragment = null;
+
                 Toast.makeText(this, "Add item", Toast.LENGTH_SHORT)
                         .show();
-                isClear = true;
-                storageFragment = null;
-                createEditor();
+
+                clearFragmentStack();
+                createEditor(null);
             default:
                 break;
         }
 
         return true;
+    }
+
+    private void clearFragmentStack() {
+        FragmentManager fm = getSupportFragmentManager();
+        for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
+            fm.popBackStack();
+        }
     }
 
     @Override
@@ -235,6 +286,26 @@ public class MainActivity extends ActionBarActivity {
         if (outState == null) {
             outState = new Bundle();
         }
+
+        if (storageFragment != null && onUserLeaveHint == null) {
+            outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
+            getSupportFragmentManager().beginTransaction().
+                    remove(storageFragment).
+                    commit();
+            storageFragment = null;
+        }
+
+        if (soldItemEditor != null) {
+            outState.putParcelable("currentItem", soldItemEditor.getCurrentItem());
+            if (onUserLeaveHint == null) {
+                getSupportFragmentManager().beginTransaction().
+                        remove(soldItemEditor).
+                        commit();
+                soldItemEditor = null;
+            }
+        }
+
+        outState.putBoolean("isStorage", isStorage);
 
 //        outState.putBoolean("isCreated", isCreated);
         /*createBundle(outState, false);
@@ -255,8 +326,8 @@ public class MainActivity extends ActionBarActivity {
             }
         }*/
 
-        super.onSaveInstanceState(outState);
-    }
+            super.onSaveInstanceState(outState);
+        }
 
     public Bundle createBundle(@Nullable Bundle bundle, boolean isEditorUsed) {
         if (bundle == null) {
@@ -270,44 +341,21 @@ public class MainActivity extends ActionBarActivity {
             bundle.putParcelableArrayList("items", (ArrayList<SoldItem>) testData);
         }
 
-        bundle.putBoolean("isCreated", isCreated);
-        bundle.putBoolean("isStorage", isStorage);
-        bundle.putBoolean("isClear", isClear);
-
-        if (soldItemEditor != null && !isEditorUsed) {
-            if ((isStorage == null || !isStorage) && onUserLeaveHint == null) {
-                currentItem = soldItemEditor.getCurrentItem();
-            }
-
-            if (currentItem != null && onUserLeaveHint == null) {
-                bundle.putParcelable("currentItem", currentItem);
-            }
-        }
+//        bundle.putBoolean("isCreated", isCreated);
+//        bundle.putBoolean("isStorage", isStorage);
+//        bundle.putBoolean("isClear", isClear);
+//
+//        if (soldItemEditor != null && !isEditorUsed) {
+//            if ((isStorage == null || !isStorage) && onUserLeaveHint == null) {
+//                currentItem = soldItemEditor.getCurrentItem();
+//            }
+//
+//            if (currentItem != null && onUserLeaveHint == null) {
+//                bundle.putParcelable("currentItem", currentItem);
+//            }
+//        }
 
         return bundle;
-    }
-
-    private void addTestData() {
-        testData.add(createItem("IPhone6 Black 32Gb quarterCore 2048 MB, discount 5%, video 512 mb, raw 4 gb, size 520 x 650", SoldDestinationType.TECHNOLOGY, 60000.00, 4));
-        testData.add(createItem("Huawey300Y Ascend doubleCore 1Gg 512 MB", SoldDestinationType.TECHNOLOGY, 5000.00, 5));
-        testData.add(createItem("Sausiges Quality Factory 1 kg", SoldDestinationType.PRODUCTS, 245.00, 300));
-        testData.add(createItem("Meat beaf 1 kg", SoldDestinationType.PRODUCTS, 400.00, 100));
-        testData.add(createItem("Bread white 250 gr", SoldDestinationType.PRODUCTS, 25.00, 400));
-        testData.add(createItem("Milk 1l", SoldDestinationType.PRODUCTS, 55.00, 300));
-        testData.add(createItem("Eggs 40 items", SoldDestinationType.PRODUCTS, 65.00, 1300));
-        testData.add(createItem("Huawey600Y Ascend quarterCore 3Gg 1024MB 17d", SoldDestinationType.TECHNOLOGY, 6245.00, 3));
-        testData.add(createItem("IPhone4 White 16 Gb doubleCore 1024 Mb", SoldDestinationType.TECHNOLOGY, 12245.00, 30));
-        testData.add(createItem("Shovel big great white", SoldDestinationType.HOUSEHOLD_GOODS, 1245.00, 130));
-        testData.add(createItem("Brush", SoldDestinationType.HOUSEHOLD_GOODS, 145.00, 530));
-        testData.add(createItem("Broom", SoldDestinationType.HOUSEHOLD_GOODS, 215.00, 330));
-        testData.add(createItem("Scoop", SoldDestinationType.HOUSEHOLD_GOODS, 65.00, 330));
-        testData.add(createItem("Towel", SoldDestinationType.HOUSEHOLD_GOODS, 165.00, 1330));
-        testData.add(createItem("Chair", SoldDestinationType.HOUSEHOLD_GOODS, 10000, 7));
-        testData.add(createItem("Red chair", SoldDestinationType.HOUSEHOLD_GOODS, 11000, 17));
-        testData.add(createItem("Black chair", SoldDestinationType.HOUSEHOLD_GOODS, 11500, 11));
-        testData.add(createItem("Mini sofa", SoldDestinationType.HOUSEHOLD_GOODS, 12000, 3));
-        testData.add(createItem("Big sofa", SoldDestinationType.HOUSEHOLD_GOODS, 17000, 2));
-        testData.add(createItem("Big white sofa", SoldDestinationType.HOUSEHOLD_GOODS, 19000, 4));
     }
 
     private SoldItem createItem(String title, SoldDestinationType type, double price, int amount) {
