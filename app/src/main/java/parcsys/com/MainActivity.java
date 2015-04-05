@@ -1,8 +1,6 @@
 package parcsys.com;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -19,14 +17,13 @@ import android.widget.Toast;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import parcsys.com.entity.SoldItem;
-import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.fragment.SoldItemEditor;
 import parcsys.com.fragment.StorageFragment;
 import parcsys.com.marketfinal.R;
 import parcsys.com.utils.DBHelper;
+import parcsys.com.utils.DaoStaticUtils;
 import parcsys.com.utils.dao.Dao;
 import parcsys.com.utils.dao.sold_item_dao.SoldItemDbDao;
 
@@ -54,6 +51,7 @@ public class MainActivity extends ActionBarActivity {
         dbHelper = new DBHelper(this, DB_VERSION);
         db = dbHelper.getWritableDatabase();
         dao = new SoldItemDbDao(db);
+        initDaoStaticUtil();
 
         if (savedInstanceState != null) {
             isStorage = (Boolean) savedInstanceState.get("isStorage");
@@ -74,6 +72,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         makeActionOverflowMenuShown();
+    }
+
+    private void initDaoStaticUtil() {
+        DaoStaticUtils daoStaticUtils = new DaoStaticUtils(dao);
     }
 
     private void createStorage(Bundle savedInstanceState) {
@@ -192,13 +194,5 @@ public class MainActivity extends ActionBarActivity {
         } catch (Exception e) {
             Log.d(TAG, e.getLocalizedMessage());
         }
-    }
-
-    public void deleteSoldItem(SoldItem item) {
-        dao.updateItem(item);
-    }
-
-    public void updateSoldItem(SoldItem item) {
-        dao.updateItem(item);
     }
 }

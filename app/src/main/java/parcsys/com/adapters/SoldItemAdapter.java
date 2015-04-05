@@ -1,29 +1,19 @@
 package parcsys.com.adapters;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import parcsys.com.entity.SoldItem;
 import parcsys.com.marketfinal.R;
+import parcsys.com.utils.DaoStaticUtils;
 import parcsys.com.utils.FormatterHelper;
 
 /**
@@ -33,7 +23,6 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
     private Context ctx;
     private List<SoldItem> items;
     private int currentOrientation;
-    private SoldItem removedItem;
 
     public SoldItemAdapter(Context ctx, List<SoldItem> items, int currentOrientation) {
         super(ctx, R.layout.sold_item_portrait, items);
@@ -72,10 +61,6 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         return view;
     }
 
-    public List<SoldItem> getItems() {
-        return items;
-    }
-
     private class BuyOnClickListener implements View.OnClickListener {
         private int position;
         private View parentView;
@@ -90,8 +75,10 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
             SoldItem soldItem = items.get(position);
             if (soldItem.getAmount() - 1 > 0) {
                 soldItem.setAmount(soldItem.getAmount() - 1);
+                DaoStaticUtils.getDao().updateItem(soldItem);
             } else {
                 items.remove(position);
+                DaoStaticUtils.getDao().removeItem(soldItem);
             }
             notifyDataSetChanged();
         }

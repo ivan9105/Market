@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import parcsys.com.MainActivity;
 import parcsys.com.adapters.SoldItemAdapter;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.entity.enums.SoldDestinationType;
@@ -51,9 +52,4 @@ public class StorageFragment extends ListFragment {
     private int getCurrentOrientation() {
         return getResources().getConfiguration().orientation;
     }
-
-    public List<SoldItem> getItems() {
-        return adapter.getItems();
-    }
-
 }
