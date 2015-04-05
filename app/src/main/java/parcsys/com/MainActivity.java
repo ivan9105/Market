@@ -27,6 +27,8 @@ import parcsys.com.fragment.SoldItemEditor;
 import parcsys.com.fragment.StorageFragment;
 import parcsys.com.marketfinal.R;
 import parcsys.com.utils.DBHelper;
+import parcsys.com.utils.dao.Dao;
+import parcsys.com.utils.dao.sold_item_dao.SoldItemDbDao;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -40,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
+    private Dao<SoldItem> dao;
 
     final int DB_VERSION = 8;
 
@@ -50,6 +53,7 @@ public class MainActivity extends ActionBarActivity {
 
         dbHelper = new DBHelper(this, DB_VERSION);
         db = dbHelper.getWritableDatabase();
+        dao = new SoldItemDbDao(db);
 
         if (savedInstanceState != null) {
             isStorage = (Boolean) savedInstanceState.get("isStorage");
@@ -57,22 +61,7 @@ public class MainActivity extends ActionBarActivity {
             Intent intent = getIntent();
             if (intent != null && intent.getStringExtra(SoldItemEditor.OK) != null) {
                 SoldItem soldItem = intent.getParcelableExtra("currentItem");
-
-                ContentValues cv = new ContentValues();
-                cv.put("ID", soldItem.getId().toString());
-                cv.put("AMOUNT", soldItem.getAmount());
-                cv.put("PRICE", soldItem.getPrice());
-                cv.put("TYPE", soldItem.getType().getId());
-                cv.put("TITLE", soldItem.getTitle());
-
-                db.beginTransaction();
-                try {
-                    db.insert("SOLD_ITEM_TABLE", null, cv);
-
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                }
+                dao.addItem(soldItem);
                 setIntent(null);
             }
         }
@@ -80,6 +69,7 @@ public class MainActivity extends ActionBarActivity {
         if (isStorage == null || isStorage) {
             createStorage(savedInstanceState);
         } else {
+            clearFragmentStack();
             createEditor(savedInstanceState);
         }
 
@@ -89,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
     private void createStorage(Bundle savedInstanceState) {
         storageFragment = new StorageFragment();
         Bundle bundle = new Bundle();
-        List<SoldItem> soldItems = loadSoldItems();
+        List<SoldItem> soldItems = dao.getItems();
         if (savedInstanceState != null && savedInstanceState.get("currentPosition") != null) {
             bundle.putInt("currentPosition", (Integer) savedInstanceState.get("currentPosition"));
         }
@@ -103,44 +93,6 @@ public class MainActivity extends ActionBarActivity {
         isStorage = true;
     }
 
-    private List<SoldItem> loadSoldItems() {
-        List<SoldItem> items = new ArrayList<SoldItem>();
-
-        db.beginTransaction();
-        try {
-            Cursor cursor = db.query("SOLD_ITEM_TABLE", new String[]{"ID", "TITLE", "AMOUNT", "PRICE", "TYPE"}, null, null, null, null, null);
-
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    String id = cursor.getString(cursor.getColumnIndex("ID"));
-                    String title = cursor.getString(cursor.getColumnIndex("TITLE"));
-                    Integer amount = cursor.getInt(cursor.getColumnIndex("AMOUNT"));
-                    Double price = cursor.getDouble(cursor.getColumnIndex("PRICE"));
-                    String type = cursor.getString(cursor.getColumnIndex("TYPE"));
-
-                    SoldItem soldItem = new SoldItem();
-                    soldItem.setId(UUID.fromString(id));
-                    soldItem.setType(SoldDestinationType.getById(type));
-                    soldItem.setAmount(amount);
-                    soldItem.setTitle(title);
-                    soldItem.setPrice(price);
-
-                    items.add(soldItem);
-
-                    cursor.moveToNext();
-                }
-            }
-
-            cursor.close();
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-
-        return items;
-    }
-
     private void createEditor(@Nullable Bundle savedInstanceState) {
         soldItemEditor = new SoldItemEditor();
 
@@ -150,7 +102,6 @@ public class MainActivity extends ActionBarActivity {
             soldItemEditor.setArguments(bundle);
         }
 
-        clearFragmentStack();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
         fragmentTransaction.commit();
@@ -173,11 +124,10 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case R.id.addItem:
                 isStorage = false;
-                storageFragment = null;
-
                 Toast.makeText(this, "Add item", Toast.LENGTH_SHORT)
                         .show();
 
+                storageFragment = null;
                 clearFragmentStack();
                 createEditor(null);
             default:
@@ -226,6 +176,8 @@ public class MainActivity extends ActionBarActivity {
 
         outState.putBoolean("isStorage", isStorage);
         super.onSaveInstanceState(outState);
+
+        onUserLeaveHint = null;
     }
 
     private void makeActionOverflowMenuShown() {
@@ -242,11 +194,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void deleteSoldItem() {
-        //Todo
+    public void deleteSoldItem(SoldItem item) {
+        dao.updateItem(item);
     }
 
-    public void updateSoldItem() {
-        //Todo
+    public void updateSoldItem(SoldItem item) {
+        dao.updateItem(item);
     }
 }
