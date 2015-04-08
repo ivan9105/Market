@@ -43,6 +43,8 @@ public class MainActivity extends ActionBarActivity {
 
     final int DB_VERSION = 8;
 
+    private Menu menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +115,10 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.actions_menu, menu);
+        this.menu = menu;
+        if (!isStorage) {
+            menu.findItem(R.id.addItem).setVisible(false);
+        }
         return true;
     }
 
@@ -132,6 +138,8 @@ public class MainActivity extends ActionBarActivity {
                 storageFragment = null;
                 clearFragmentStack();
                 createEditor(null);
+
+                menu.findItem(R.id.addItem).setVisible(false);
             default:
                 break;
         }
