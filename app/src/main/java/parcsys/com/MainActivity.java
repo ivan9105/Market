@@ -1,5 +1,6 @@
 package parcsys.com;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -105,7 +106,7 @@ public class MainActivity extends ActionBarActivity {
         storageFragment.setArguments(bundle);
 
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
+        fragmentTransaction.replace(R.id.fragmentFrame, storageFragment);
         fragmentTransaction.commit();
         isStorage = true;
     }
@@ -168,12 +169,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onUserLeaveHint() {
-        onUserLeaveHint = true;
-        super.onUserLeaveHint();
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState == null) {
             outState = new Bundle();
@@ -181,20 +176,11 @@ public class MainActivity extends ActionBarActivity {
 
         if (storageFragment != null && onUserLeaveHint == null) {
             outState.putInt("currentPosition", storageFragment.getListView().getFirstVisiblePosition());
-            getSupportFragmentManager().beginTransaction().
-                    remove(storageFragment).
-                    commit();
             storageFragment = null;
         }
 
         if (soldItemEditor != null) {
             outState.putParcelable("currentItem", soldItemEditor.getCurrentItem());
-            if (onUserLeaveHint == null) {
-                getSupportFragmentManager().beginTransaction().
-                        remove(soldItemEditor).
-                        commit();
-                soldItemEditor = null;
-            }
         }
 
         outState.putBoolean("isStorage", isStorage);
@@ -214,16 +200,6 @@ public class MainActivity extends ActionBarActivity {
             }
         } catch (Exception e) {
             Log.d(TAG, e.getLocalizedMessage());
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        boolean isScreenOn = powerManager.isScreenOn();
-        if (!isScreenOn) {
-
         }
     }
 }
