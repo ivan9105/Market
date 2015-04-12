@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -25,7 +26,7 @@ import parcsys.com.marketfinal.R;
 import parcsys.com.utils.DBHelper;
 import parcsys.com.utils.DaoStaticUtils;
 import parcsys.com.utils.dao.Dao;
-import parcsys.com.utils.dao.sold_item_dao.SoldItemDbDao;
+import parcsys.com.utils.dao.sold_item_dao.SoldItemJSONDao;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -37,11 +38,9 @@ public class MainActivity extends ActionBarActivity {
     private Boolean isStorage;
     private Boolean onUserLeaveHint;
 
-    private DBHelper dbHelper;
-    private SQLiteDatabase db;
     private Dao<SoldItem> dao;
 
-    final int DB_VERSION = 8;
+    final int DB_VERSION = 12;
 
     private Menu menu;
 
@@ -50,9 +49,9 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        dbHelper = new DBHelper(this, DB_VERSION);
-        db = dbHelper.getWritableDatabase();
-        dao = new SoldItemDbDao(db);
+        DBHelper dbHelper = new DBHelper(this, DB_VERSION);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        dao = new SoldItemJSONDao(db);
         initDaoStaticUtil();
 
         if (savedInstanceState != null) {
@@ -61,7 +60,22 @@ public class MainActivity extends ActionBarActivity {
             Intent intent = getIntent();
             if (intent != null && intent.getStringExtra(SoldItemEditor.OK) != null) {
                 SoldItem soldItem = intent.getParcelableExtra("currentItem");
-                dao.addItem(soldItem);
+
+                List<SoldItem> items = dao.getItems();
+                boolean modified = false;
+                for (SoldItem item : items) {
+                    if (item.getTitle().equals(soldItem.getTitle())) {
+                        item.setAmount(item.getAmount() + soldItem.getAmount());
+                        dao.updateItem(item);
+
+                        modified = true;
+                    }
+                }
+
+                if (!modified) {
+                    dao.addItem(soldItem);
+                }
+
                 setIntent(null);
             }
         }
@@ -93,7 +107,6 @@ public class MainActivity extends ActionBarActivity {
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.fragmentFrame, storageFragment);
         fragmentTransaction.commit();
-
         isStorage = true;
     }
 
@@ -201,6 +214,16 @@ public class MainActivity extends ActionBarActivity {
             }
         } catch (Exception e) {
             Log.d(TAG, e.getLocalizedMessage());
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        boolean isScreenOn = powerManager.isScreenOn();
+        if (!isScreenOn) {
+
         }
     }
 }
