@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS SOLD_ITEM_MODIFIED_HISTORY_TABLE (
+    ID text,
+    IMEI text,
+    TYPE text,
+    CREATE_TS datetime
+)^

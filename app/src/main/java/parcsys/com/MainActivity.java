@@ -1,6 +1,7 @@
 package parcsys.com;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -201,5 +203,10 @@ public class MainActivity extends ActionBarActivity {
         } catch (Exception e) {
             Log.d(TAG, e.getLocalizedMessage());
         }
+    }
+
+    private String getDeviceId() {
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        return telephonyManager.getDeviceId();
     }
 }
