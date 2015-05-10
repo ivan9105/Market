@@ -53,7 +53,7 @@ public class MainActivity extends ActionBarActivity {
 
     private Menu menu;
 
-    public Map<Integer, DisableBuyAction> buyTasks;
+    public List<DisableBuyAction> buyTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,11 @@ public class MainActivity extends ActionBarActivity {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         dao = new SoldItemJSONDao(db);
         initDaoStaticUtil();
+
+        buyTasks = (List<DisableBuyAction>) getLastCustomNonConfigurationInstance();
+        if (buyTasks == null) {
+            buyTasks = new ArrayList<DisableBuyAction>();
+        }
 
         if (savedInstanceState != null) {
             isStorage = (Boolean) savedInstanceState.get("isStorage");
@@ -223,17 +228,38 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void createDisableBuyAction(UUID uuid) {
-        DisableBuyAction disableBuyAction = new DisableBuyAction(uuid, storageFragment);
+        DisableBuyAction disableBuyAction = new DisableBuyAction(uuid, this);
+        buyTasks.add(disableBuyAction);
         disableBuyAction.execute();
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        for (DisableBuyAction buyAction : buyTasks) {
+            buyAction.unlink();
+        }
+        return buyTasks;
+    }
+
+    private StorageFragment getStorage() {
+        return storageFragment;
     }
 
     private class DisableBuyAction extends AsyncTask<Void, Void, Void> {
         private UUID uuid;
-        private StorageFragment storage;
+        private MainActivity activity;
 
-        DisableBuyAction(UUID uuid, StorageFragment storage) {
+        DisableBuyAction(UUID uuid, MainActivity activity) {
             this.uuid = uuid;
-            this.storage = storage;
+            this.activity = activity;
+        }
+
+        public void link(MainActivity activity) {
+            this.activity = activity;
+        }
+
+        public void unlink() {
+            this.activity = null;
         }
 
         @Override
@@ -260,8 +286,8 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (storage != null) {
-                ListAdapter adapter = storageFragment.getListAdapter();
+            if (activity != null && activity.getStorage() != null) {
+                ListAdapter adapter = activity.getStorage().getListAdapter();
 
                 SoldItemWrapper wrapper = null;
 
