@@ -53,8 +53,6 @@ public class MainActivity extends ActionBarActivity {
 
     private Menu menu;
 
-    public List<DisableBuyAction> buyTasks;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,11 +62,6 @@ public class MainActivity extends ActionBarActivity {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         dao = new SoldItemJSONDao(db);
         initDaoStaticUtil();
-
-        buyTasks = (List<DisableBuyAction>) getLastCustomNonConfigurationInstance();
-        if (buyTasks == null) {
-            buyTasks = new ArrayList<DisableBuyAction>();
-        }
 
         if (savedInstanceState != null) {
             isStorage = (Boolean) savedInstanceState.get("isStorage");
@@ -229,16 +222,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void createDisableBuyAction(UUID uuid) {
         DisableBuyAction disableBuyAction = new DisableBuyAction(uuid, this);
-        buyTasks.add(disableBuyAction);
         disableBuyAction.execute();
-    }
-
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        for (DisableBuyAction buyAction : buyTasks) {
-            buyAction.unlink();
-        }
-        return buyTasks;
     }
 
     private StorageFragment getStorage() {
@@ -286,21 +270,29 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (activity != null && activity.getStorage() != null) {
-                ListAdapter adapter = activity.getStorage().getListAdapter();
+            //Todo поворот экрана нахуй
+            //Todo вс и пн добей уже осталась хуйня а не без поворота логика
+            if (activity != null) {
+                if (activity.getStorage() != null) {
+                    ListAdapter adapter = activity.getStorage().getListAdapter();
 
-                SoldItemWrapper wrapper = null;
+                    SoldItemWrapper wrapper = null;
 
-                for (int i = 0; i < adapter.getCount(); i++) {
-                    if (((SoldItemWrapper) adapter.getItem(i)).getSoldItem().getId().equals(uuid)) {
-                        wrapper = (SoldItemWrapper) adapter.getItem(i);
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        if (((SoldItemWrapper) adapter.getItem(i)).getSoldItem().getId().equals(uuid)) {
+                            wrapper = (SoldItemWrapper) adapter.getItem(i);
+                        }
                     }
-                }
-                if (wrapper != null) {
-                    wrapper.setEnable(true);
-                    synchronized (adapter) {
-                        ((ArrayAdapter) adapter).notifyDataSetChanged();
+                    if (wrapper != null) {
+                        //Todo здесь в ui совершается покупка
+                        wrapper.setEnable(true);
+
+                        synchronized (adapter) {
+                            ((ArrayAdapter) adapter).notifyDataSetChanged();
+                        }
                     }
+                } else {
+                    //todo через базу
                 }
             }
         }
