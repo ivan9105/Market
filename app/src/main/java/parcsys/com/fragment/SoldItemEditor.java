@@ -29,6 +29,8 @@ import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.marketfinal.R;
 
 public class SoldItemEditor extends Fragment {
+    public static final String NAME = "editor";
+
     private Spinner typeField;
     private EditText editTitle, editAmount, editPrice;
 

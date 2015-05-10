@@ -1,12 +1,11 @@
 package parcsys.com;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,12 +15,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import parcsys.com.adapters.SoldItemWrapper;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.fragment.SoldItemEditor;
 import parcsys.com.fragment.StorageFragment;
@@ -46,6 +52,8 @@ public class MainActivity extends ActionBarActivity {
     final int DB_VERSION = 12;
 
     private Menu menu;
+
+    public Map<Integer, DisableBuyAction> buyTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,16 +109,24 @@ public class MainActivity extends ActionBarActivity {
         storageFragment = new StorageFragment();
         Bundle bundle = new Bundle();
         List<SoldItem> soldItems = dao.getItems();
+
+        List<SoldItemWrapper> wrappers = new ArrayList<SoldItemWrapper>();
+        for (SoldItem item : soldItems) {
+            wrappers.add(new SoldItemWrapper(item, true));
+        }
+
         if (savedInstanceState != null && savedInstanceState.get("currentPosition") != null) {
             bundle.putInt("currentPosition", (Integer) savedInstanceState.get("currentPosition"));
         }
-        bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) soldItems);
+        bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) wrappers);
         storageFragment.setArguments(bundle);
 
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentFrame, storageFragment);
+        fragmentTransaction.replace(R.id.fragmentFrame, storageFragment, StorageFragment.NAME);
         fragmentTransaction.commit();
         isStorage = true;
+
+        storageFragment.setActivity(this);
     }
 
     private void createEditor(@Nullable Bundle savedInstanceState) {
@@ -123,7 +139,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor);
+        fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor, SoldItemEditor.NAME);
         fragmentTransaction.commit();
     }
 
@@ -186,6 +202,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         outState.putBoolean("isStorage", isStorage);
+
         super.onSaveInstanceState(outState);
 
         onUserLeaveHint = null;
@@ -205,8 +222,61 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private String getDeviceId() {
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        return telephonyManager.getDeviceId();
+    public void createDisableBuyAction(UUID uuid) {
+        DisableBuyAction disableBuyAction = new DisableBuyAction(uuid, storageFragment);
+        disableBuyAction.execute();
+    }
+
+    private class DisableBuyAction extends AsyncTask<Void, Void, Void> {
+        private UUID uuid;
+        private StorageFragment storage;
+
+        DisableBuyAction(UUID uuid, StorageFragment storage) {
+            this.uuid = uuid;
+            this.storage = storage;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                for (int i = 1; i <= 7; i++) {
+                    TimeUnit.SECONDS.sleep(1);
+                    Log.d("qwe", "i = " + i
+                            + ", MyTask: " + this.hashCode()
+                            + ", MainActivity: " + MainActivity.this.hashCode());
+                }
+                onProgressUpdate();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (storage != null) {
+                ListAdapter adapter = storageFragment.getListAdapter();
+
+                SoldItemWrapper wrapper = null;
+
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    if (((SoldItemWrapper) adapter.getItem(i)).getSoldItem().getId().equals(uuid)) {
+                        wrapper = (SoldItemWrapper) adapter.getItem(i);
+                    }
+                }
+                if (wrapper != null) {
+                    wrapper.setEnable(true);
+                    synchronized (adapter) {
+                        ((ArrayAdapter) adapter).notifyDataSetChanged();
+                    }
+                }
+            }
+        }
     }
 }

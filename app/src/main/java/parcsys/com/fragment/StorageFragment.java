@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import parcsys.com.MainActivity;
 import parcsys.com.adapters.SoldItemAdapter;
+import parcsys.com.adapters.SoldItemWrapper;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.entity.enums.SoldDestinationType;
 import parcsys.com.marketfinal.R;
@@ -22,7 +23,9 @@ import parcsys.com.marketfinal.R;
  * Created by Иван on 25.01.2015.
  */
 public class StorageFragment extends ListFragment {
-    private SoldItemAdapter adapter;
+    public static final String NAME = "storage";
+
+    private static MainActivity mainActivity;
 
     public StorageFragment() {
     }
@@ -40,8 +43,8 @@ public class StorageFragment extends ListFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        List<SoldItem> testData = getArguments().getParcelableArrayList("items");
-        this.adapter = new SoldItemAdapter
+        List<SoldItemWrapper> testData = getArguments().getParcelableArrayList("items");
+        SoldItemAdapter adapter = new SoldItemAdapter
                 (getActivity().getApplicationContext(), testData, getCurrentOrientation());
         setListAdapter(adapter);
 
@@ -51,5 +54,13 @@ public class StorageFragment extends ListFragment {
 
     private int getCurrentOrientation() {
         return getResources().getConfiguration().orientation;
+    }
+
+    public void setActivity(MainActivity mainActivity) {
+        StorageFragment.mainActivity = mainActivity;
+    }
+
+    public static void disableItem(UUID uuid) {
+        mainActivity.createDisableBuyAction(uuid);
     }
 }

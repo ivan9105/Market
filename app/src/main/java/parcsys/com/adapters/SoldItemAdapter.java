@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import parcsys.com.entity.SoldItem;
+import parcsys.com.fragment.StorageFragment;
 import parcsys.com.marketfinal.R;
 import parcsys.com.utils.DaoStaticUtils;
 import parcsys.com.utils.FormatterHelper;
@@ -19,12 +20,12 @@ import parcsys.com.utils.FormatterHelper;
 /**
  * Created by Иван on 25.01.2015.
  */
-public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
+public class SoldItemAdapter extends ArrayAdapter<SoldItemWrapper> {
     private Context ctx;
-    private List<SoldItem> items;
+    private List<SoldItemWrapper> items;
     private int currentOrientation;
 
-    public SoldItemAdapter(Context ctx, List<SoldItem> items, int currentOrientation) {
+    public SoldItemAdapter(Context ctx, List<SoldItemWrapper> items, int currentOrientation) {
         super(ctx, R.layout.sold_item_portrait, items);
         this.ctx = ctx;
         this.items = items;
@@ -44,7 +45,8 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
         }
 
 
-        SoldItem item = items.get(position);
+        SoldItemWrapper wrapper = items.get(position);
+        SoldItem item = wrapper.getSoldItem();
 
         String titleText = item.getTitle();
         if (titleText.length() > 64) {
@@ -57,6 +59,9 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
 
         Button buttonBuy = (Button) view.findViewById(R.id.btn_buy);
         buttonBuy.setOnClickListener(new BuyOnClickListener(position, view));
+        if (!wrapper.isEnable()) {
+            buttonBuy.setEnabled(false);
+        }
 
         return view;
     }
@@ -72,13 +77,16 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItem> {
 
         @Override
         public void onClick(View v) {
-            SoldItem soldItem = items.get(position);
-            if (soldItem.getAmount() - 1 > 0) {
-                soldItem.setAmount(soldItem.getAmount() - 1);
-                DaoStaticUtils.getDao().updateItem(soldItem);
+            SoldItemWrapper wrapper = items.get(position);
+            SoldItem item = wrapper.getSoldItem();
+            if (item.getAmount() - 1 > 0) {
+                item.setAmount(item.getAmount() - 1);
+                DaoStaticUtils.getDao().updateItem(item);
+                wrapper.setEnable(false);
+                StorageFragment.disableItem(item.getId());
             } else {
                 items.remove(position);
-                DaoStaticUtils.getDao().removeItem(soldItem);
+                DaoStaticUtils.getDao().removeItem(item);
             }
             notifyDataSetChanged();
         }
