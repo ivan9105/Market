@@ -236,14 +236,6 @@ public class MainActivity extends ActionBarActivity {
             this.activity = activity;
         }
 
-        public void link(MainActivity activity) {
-            this.activity = activity;
-        }
-
-        public void unlink() {
-            this.activity = null;
-        }
-
         @Override
         protected Void doInBackground(Void... params) {
             try {
@@ -268,7 +260,6 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            //Todo придумать что делать если все происходит в oldActivity просмотреть backStack чтобы старая activity возвращалс
             if (activity != null) {
                 if (activity.getStorage() != null) {
                     ListAdapter adapter = activity.getStorage().getListAdapter();
