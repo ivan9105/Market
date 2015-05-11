@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import parcsys.com.adapters.SoldItemAdapter;
 import parcsys.com.adapters.SoldItemWrapper;
 import parcsys.com.entity.SoldItem;
 import parcsys.com.fragment.SoldItemEditor;
@@ -267,7 +268,8 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (activity != null) {//Todo activity проебывается разобраться с backstack
+            //Todo придумать что делать если все происходит в oldActivity просмотреть backStack чтобы старая activity возвращалс
+            if (activity != null) {
                 if (activity.getStorage() != null) {
                     ListAdapter adapter = activity.getStorage().getListAdapter();
 
@@ -279,13 +281,13 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }
                     if (wrapper != null) {
-                        /*if (item.getAmount() - 1 > 0) {
+                        if (item.getAmount() - 1 > 0) {
                             item.setAmount(item.getAmount() - 1);
                             DaoStaticUtils.getDao().updateItem(item);
                         } else {
-                            items.remove(position);
+                            ((SoldItemAdapter) adapter).remove(wrapper);
                             DaoStaticUtils.getDao().removeItem(item);
-                        }*/
+                        }
                         wrapper.setEnable(true);
 
                         synchronized (adapter) {
@@ -293,7 +295,7 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }
                 } else {
-                    //todo через базу
+                    dao.buyItem(item);
                 }
             }
         }

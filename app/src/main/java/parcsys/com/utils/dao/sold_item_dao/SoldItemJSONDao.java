@@ -125,13 +125,13 @@ public class SoldItemJSONDao implements Dao<SoldItem>{
 
         db.beginTransaction();
         try {
-            Cursor isExistCursor = db.rawQuery("SELECT id, amount FROM SOLD_ITEM_JSON_TABLE WHERE id = ?", new String[]{item.getId().toString()});
+            Cursor isExistCursor = db.rawQuery("SELECT id, AMOUNT FROM SOLD_ITEM_TABLE WHERE id = ?", new String[]{item.getId().toString()});
             if (isExistCursor.getCount() > 0) {
 
                 int amount = 0;
                 isExistCursor.moveToFirst();
                 do {
-                    amount = isExistCursor.getInt(isExistCursor.getColumnIndex("amount"));
+                    amount = isExistCursor.getInt(isExistCursor.getColumnIndex("AMOUNT"));
                 } while (isExistCursor.moveToNext());
 
                 if (amount > 0) {
