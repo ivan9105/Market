@@ -46,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
     private StorageFragment storageFragment;
     private SoldItemEditor soldItemEditor;
     private Boolean isStorage;
-    private Boolean onUserLeaveHint;
+//    private Boolean onUserLeaveHint;
 
     private Dao<SoldItem> dao;
 
@@ -64,6 +64,10 @@ public class MainActivity extends ActionBarActivity {
         dao = new SoldItemJSONDao(db);
         initDaoStaticUtil();
 
+        //Todo избавиться от new intent во item editor от saved state
+        //Todo с фрагментами будет динамическая работа изначально будет storage чтобы activity не пересоздавалось
+        //изменять начиная отсюда
+        /*
         if (savedInstanceState != null) {
             isStorage = (Boolean) savedInstanceState.get("isStorage");
         } else {
@@ -95,6 +99,7 @@ public class MainActivity extends ActionBarActivity {
         } else {
             createEditor(savedInstanceState);
         }
+        */
 
         makeActionOverflowMenuShown();
     }
@@ -176,15 +181,15 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    @Override
+/*    @Override
     protected void onUserLeaveHint() {
         onUserLeaveHint = true;
         super.onUserLeaveHint();
-    }
+    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (outState == null) {
+        /*if (outState == null) {
             outState = new Bundle();
         }
 
@@ -201,7 +206,7 @@ public class MainActivity extends ActionBarActivity {
 
         super.onSaveInstanceState(outState);
 
-        onUserLeaveHint = null;
+        onUserLeaveHint = null;*/
     }
 
     private void makeActionOverflowMenuShown() {
