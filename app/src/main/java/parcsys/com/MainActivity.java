@@ -46,6 +46,7 @@ public class MainActivity extends ActionBarActivity {
     private StorageFragment storageFragment;
     private SoldItemEditor soldItemEditor;
     private Boolean isStorage;
+    private int currentPosition = 0;
 //    private Boolean onUserLeaveHint;
 
     private Dao<SoldItem> dao;
@@ -64,6 +65,7 @@ public class MainActivity extends ActionBarActivity {
         dao = new SoldItemJSONDao(db);
         initDaoStaticUtil();
 
+        createStorage();
         //Todo избавиться от new intent во item editor от saved state
         //Todo с фрагментами будет динамическая работа изначально будет storage чтобы activity не пересоздавалось
         //изменять начиная отсюда
@@ -108,7 +110,7 @@ public class MainActivity extends ActionBarActivity {
         DaoStaticUtils daoStaticUtils = new DaoStaticUtils(dao);
     }
 
-    private void createStorage(Bundle savedInstanceState) {
+    public void createStorage() {
         storageFragment = new StorageFragment();
         Bundle bundle = new Bundle();
         List<SoldItem> soldItems = dao.getItems();
@@ -118,8 +120,8 @@ public class MainActivity extends ActionBarActivity {
             wrappers.add(new SoldItemWrapper(item, true));
         }
 
-        if (savedInstanceState != null && savedInstanceState.get("currentPosition") != null) {
-            bundle.putInt("currentPosition", (Integer) savedInstanceState.get("currentPosition"));
+        if (currentPosition != 0) {
+            bundle.putInt("currentPosition", (Integer) currentPosition);
         }
         bundle.putParcelableArrayList("items", (ArrayList<? extends Parcelable>) wrappers);
         storageFragment.setArguments(bundle);
@@ -132,15 +134,14 @@ public class MainActivity extends ActionBarActivity {
         storageFragment.setActivity(this);
     }
 
-    private void createEditor(@Nullable Bundle savedInstanceState) {
+    private void createEditor() {
         soldItemEditor = new SoldItemEditor();
-
-        if (savedInstanceState != null && savedInstanceState.get("currentItem") != null) {
+       /* if (savedInstanceState != null && savedInstanceState.get("currentItem") != null) {
             Bundle bundle = new Bundle();
             bundle.putParcelable("currentItem", (Parcelable) savedInstanceState.get("currentItem"));
             soldItemEditor.setArguments(bundle);
-        }
-
+        }*/
+        //Todo set activity method
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor, SoldItemEditor.NAME);
         fragmentTransaction.commit();
@@ -171,7 +172,7 @@ public class MainActivity extends ActionBarActivity {
                         .show();
 
                 storageFragment = null;
-                createEditor(null);
+                createEditor();
 
                 menu.findItem(R.id.addItem).setVisible(false);
             default:
