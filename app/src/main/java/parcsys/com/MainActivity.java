@@ -132,16 +132,15 @@ public class MainActivity extends ActionBarActivity {
         isStorage = true;
 
         storageFragment.setActivity(this);
+
+        if (menu != null && !menu.findItem(R.id.addItem).isVisible()) {
+            menu.findItem(R.id.addItem).setVisible(true);
+        }
     }
 
     private void createEditor() {
         soldItemEditor = new SoldItemEditor();
-       /* if (savedInstanceState != null && savedInstanceState.get("currentItem") != null) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("currentItem", (Parcelable) savedInstanceState.get("currentItem"));
-            soldItemEditor.setArguments(bundle);
-        }*/
-        //Todo set activity method
+        soldItemEditor.setMainActivity(this);
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragmentFrame, soldItemEditor, SoldItemEditor.NAME);
         fragmentTransaction.commit();

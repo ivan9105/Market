@@ -41,6 +41,8 @@ public class SoldItemEditor extends Fragment {
 
     private boolean isCancel = false;
 
+    private MainActivity mainActivity;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view;
@@ -66,11 +68,12 @@ public class SoldItemEditor extends Fragment {
             @Override
             public void onClick(View v) {
                 if (validateFields()) {
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    /*Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(OK, OK);
                     intent.putExtra("currentItem", getCurrentItem());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    startActivity(intent);*/
+                    mainActivity.createStorage();
                 }
             }
         });
@@ -78,11 +81,12 @@ public class SoldItemEditor extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isCancel = true;
+                /*isCancel = true;
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra(CANCEL, CANCEL);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                startActivity(intent);*/
+                mainActivity.createStorage();
             }
         });
     }
@@ -214,5 +218,9 @@ public class SoldItemEditor extends Fragment {
 
     private int getCurrentOrientation() {
         return getResources().getConfiguration().orientation;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 }
