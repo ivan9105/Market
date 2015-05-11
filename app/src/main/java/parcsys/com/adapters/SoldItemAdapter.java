@@ -79,15 +79,8 @@ public class SoldItemAdapter extends ArrayAdapter<SoldItemWrapper> {
         public void onClick(View v) {
             SoldItemWrapper wrapper = items.get(position);
             SoldItem item = wrapper.getSoldItem();
-            if (item.getAmount() - 1 > 0) {
-                item.setAmount(item.getAmount() - 1);
-                DaoStaticUtils.getDao().updateItem(item);
-                wrapper.setEnable(false);
-                StorageFragment.disableItem(item.getId());
-            } else {
-                items.remove(position);
-                DaoStaticUtils.getDao().removeItem(item);
-            }
+            StorageFragment.createBuyTask(item);
+            wrapper.setEnable(false);
             notifyDataSetChanged();
         }
     }

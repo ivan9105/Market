@@ -99,6 +99,11 @@ public class SoldItemDbDao implements Dao<SoldItem> {
         return items;
     }
 
+    @Override
+    public boolean buyItem(SoldItem item) {
+        return true;
+    }
+
     private ContentValues getContentValues(SoldItem item) {
         ContentValues cv = new ContentValues();
         cv.put("ID", item.getId().toString());

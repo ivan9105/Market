@@ -10,7 +10,7 @@ public class DaoStaticUtils {
     private static Dao<SoldItem> dao;
 
     public DaoStaticUtils(Dao<SoldItem> dao) {
-        this.dao = dao;
+        DaoStaticUtils.dao = dao;
     }
 
     public static Dao<SoldItem> getDao() {

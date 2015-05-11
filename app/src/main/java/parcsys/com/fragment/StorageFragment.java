@@ -60,7 +60,7 @@ public class StorageFragment extends ListFragment {
         StorageFragment.mainActivity = mainActivity;
     }
 
-    public static void disableItem(UUID uuid) {
-        mainActivity.createDisableBuyAction(uuid);
+    public static void createBuyTask(SoldItem item) {
+        mainActivity.createDisableBuyAction(item);
     }
 }

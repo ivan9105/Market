@@ -1,5 +1,6 @@
 package parcsys.com.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,8 +69,7 @@ public class SoldItemEditor extends Fragment {
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(OK, OK);
                     intent.putExtra("currentItem", getCurrentItem());
-
-//                    fillIntent(intent);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
             }
@@ -81,21 +81,10 @@ public class SoldItemEditor extends Fragment {
                 isCancel = true;
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra(CANCEL, CANCEL);
-//                fillIntent(intent);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });
-    }
-
-    private void fillIntent(Intent intent) {
-        Bundle arguments = getArguments();
-        intent.putExtra("isStorage", (Boolean) arguments.get("isStorage"));
-        intent.putExtra("isCreated", (Boolean) arguments.get("isCreated"));
-        intent.putExtra("isClear", (Boolean) arguments.get("isClear"));
-        ArrayList<SoldItem> items = (ArrayList<SoldItem>) arguments.get("items");
-        intent.putParcelableArrayListExtra("items", items);
-        intent.putExtra("currentPosition", (Integer) arguments.get("currentPosition"));
     }
 
     private boolean validateFields() {

@@ -92,7 +92,6 @@ public class MainActivity extends ActionBarActivity {
         if (isStorage == null || isStorage) {
             createStorage(savedInstanceState);
         } else {
-            clearFragmentStack();
             createEditor(savedInstanceState);
         }
 
@@ -166,7 +165,6 @@ public class MainActivity extends ActionBarActivity {
                         .show();
 
                 storageFragment = null;
-                clearFragmentStack();
                 createEditor(null);
 
                 menu.findItem(R.id.addItem).setVisible(false);
@@ -177,11 +175,10 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    private void clearFragmentStack() {
-        FragmentManager fm = getSupportFragmentManager();
-        for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
-            fm.popBackStack();
-        }
+    @Override
+    protected void onUserLeaveHint() {
+        onUserLeaveHint = true;
+        super.onUserLeaveHint();
     }
 
     @Override
@@ -220,8 +217,8 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void createDisableBuyAction(UUID uuid) {
-        DisableBuyAction disableBuyAction = new DisableBuyAction(uuid, this);
+    public void createDisableBuyAction(SoldItem item) {
+        DisableBuyAction disableBuyAction = new DisableBuyAction(item, this);
         disableBuyAction.execute();
     }
 
@@ -230,11 +227,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private class DisableBuyAction extends AsyncTask<Void, Void, Void> {
-        private UUID uuid;
+        private SoldItem item;
         private MainActivity activity;
 
-        DisableBuyAction(UUID uuid, MainActivity activity) {
-            this.uuid = uuid;
+        DisableBuyAction(SoldItem item, MainActivity activity) {
+            this.item = item;
             this.activity = activity;
         }
 
@@ -270,21 +267,25 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            //Todo поворот экрана нахуй
-            //Todo вс и пн добей уже осталась хуйня а не без поворота логика
-            if (activity != null) {
+            if (activity != null) {//Todo activity проебывается разобраться с backstack
                 if (activity.getStorage() != null) {
                     ListAdapter adapter = activity.getStorage().getListAdapter();
 
                     SoldItemWrapper wrapper = null;
 
                     for (int i = 0; i < adapter.getCount(); i++) {
-                        if (((SoldItemWrapper) adapter.getItem(i)).getSoldItem().getId().equals(uuid)) {
+                        if (((SoldItemWrapper) adapter.getItem(i)).getSoldItem().getId().equals(item.getId())) {
                             wrapper = (SoldItemWrapper) adapter.getItem(i);
                         }
                     }
                     if (wrapper != null) {
-                        //Todo здесь в ui совершается покупка
+                        /*if (item.getAmount() - 1 > 0) {
+                            item.setAmount(item.getAmount() - 1);
+                            DaoStaticUtils.getDao().updateItem(item);
+                        } else {
+                            items.remove(position);
+                            DaoStaticUtils.getDao().removeItem(item);
+                        }*/
                         wrapper.setEnable(true);
 
                         synchronized (adapter) {
