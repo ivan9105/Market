@@ -228,6 +228,23 @@ public class MainActivity extends ActionBarActivity {
         disableBuyAction.execute();
     }
 
+    public void addItemAction(SoldItem soldItem) {
+        List<SoldItem> items = dao.getItems();
+        boolean modified = false;
+        for (SoldItem item : items) {
+            if (item.getTitle().equals(soldItem.getTitle())) {
+                item.setAmount(item.getAmount() + soldItem.getAmount());
+                dao.updateItem(item);
+
+                modified = true;
+            }
+        }
+
+        if (!modified) {
+            dao.addItem(soldItem);
+        }
+    }
+
     private StorageFragment getStorage() {
         return storageFragment;
     }

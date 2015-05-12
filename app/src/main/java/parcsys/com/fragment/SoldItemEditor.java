@@ -68,11 +68,7 @@ public class SoldItemEditor extends Fragment {
             @Override
             public void onClick(View v) {
                 if (validateFields()) {
-                    /*Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.putExtra(OK, OK);
-                    intent.putExtra("currentItem", getCurrentItem());
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);*/
+                    mainActivity.addItemAction(getCurrentItem());
                     mainActivity.createStorage();
                 }
             }
@@ -81,11 +77,6 @@ public class SoldItemEditor extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*isCancel = true;
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.putExtra(CANCEL, CANCEL);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);*/
                 mainActivity.createStorage();
             }
         });
