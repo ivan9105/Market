@@ -1,16 +1,11 @@
 package parcsys.com;
 
-import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,10 +16,7 @@ import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import parcsys.com.adapters.SoldItemAdapter;
@@ -229,8 +221,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void createDisableBuyAction(SoldItem item) {
-        DisableBuyAction disableBuyAction = new DisableBuyAction(item, this);
-        disableBuyAction.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        DisableBuyTask disableBuyTask = new DisableBuyTask(item, this);
+        disableBuyTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         disabledItems.add(item);
     }
 
@@ -255,11 +247,19 @@ public class MainActivity extends ActionBarActivity {
         return storageFragment;
     }
 
-    private class DisableBuyAction extends AsyncTask<Void, Void, Void> {
+    private class AddedTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            return null;
+        }
+    }
+
+    private class DisableBuyTask extends AsyncTask<Void, Void, Void> {
         private SoldItem item;
         private MainActivity activity;
 
-        DisableBuyAction(SoldItem item, MainActivity activity) {
+        DisableBuyTask(SoldItem item, MainActivity activity) {
             this.item = item;
             this.activity = activity;
         }
