@@ -119,4 +119,21 @@ public class SoldItem implements Parcelable{
             this.price = priceFromParcel;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SoldItem item = (SoldItem) o;
+
+        if (!id.equals(item.id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

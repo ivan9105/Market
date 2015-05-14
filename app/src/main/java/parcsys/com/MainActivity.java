@@ -47,6 +47,7 @@ public class MainActivity extends ActionBarActivity {
     private SoldItemEditor soldItemEditor;
     private Boolean isStorage;
     private int currentPosition = 0;
+    List<SoldItem> disabledItems = new ArrayList<SoldItem>();
 //    private Boolean onUserLeaveHint;
 
     private Dao<SoldItem> dao;
@@ -107,7 +108,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void initDaoStaticUtil() {
-        DaoStaticUtils daoStaticUtils = new DaoStaticUtils(dao);
+        new DaoStaticUtils(dao);
     }
 
     public void createStorage() {
@@ -117,7 +118,11 @@ public class MainActivity extends ActionBarActivity {
 
         List<SoldItemWrapper> wrappers = new ArrayList<SoldItemWrapper>();
         for (SoldItem item : soldItems) {
-            wrappers.add(new SoldItemWrapper(item, true));
+            if (!disabledItems.contains(item)) {
+                wrappers.add(new SoldItemWrapper(item, true));
+            } else {
+                wrappers.add(new SoldItemWrapper(item, false));
+            }
         }
 
         if (currentPosition != 0) {
@@ -225,7 +230,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void createDisableBuyAction(SoldItem item) {
         DisableBuyAction disableBuyAction = new DisableBuyAction(item, this);
-        disableBuyAction.execute();
+        disableBuyAction.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        disabledItems.add(item);
     }
 
     public void addItemAction(SoldItem soldItem) {
@@ -261,7 +267,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                for (int i = 1; i <= 7; i++) {
+                for (int i = 1; i <= 15; i++) {
                     TimeUnit.SECONDS.sleep(1);
                     Log.d("qwe", "i = " + i
                             + ", MyTask: " + this.hashCode()
@@ -310,6 +316,8 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     dao.buyItem(item);
                 }
+
+                disabledItems.remove(item);
             }
         }
     }
