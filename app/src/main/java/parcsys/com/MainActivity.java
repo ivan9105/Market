@@ -226,7 +226,12 @@ public class MainActivity extends ActionBarActivity {
         disabledItems.add(item);
     }
 
-    public void addItemAction(SoldItem soldItem) {
+    public void createAddItemAction(SoldItem item) {
+        AddedTask addedTask = new AddedTask(item, this);
+        addedTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    private void addItemAction(SoldItem soldItem) {
         List<SoldItem> items = dao.getItems();
         boolean modified = false;
         for (SoldItem item : items) {
@@ -248,10 +253,43 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private class AddedTask extends AsyncTask<Void, Void, Void> {
+        private SoldItem item;
+        private MainActivity activity;
+
+        public AddedTask(SoldItem item, MainActivity activity) {
+            this.item = item;
+            this.activity = activity;
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
+            try {
+                for (int i = 1; i <= 15; i++) {
+                    TimeUnit.SECONDS.sleep(1);
+                    Log.d("qwe", "i = " + i
+                            + ", AddedTask: " + this.hashCode()
+                            + ", MainActivity: " + MainActivity.this.hashCode());
+                }
+                onProgressUpdate();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            addItemAction(item);
+            if (activity != null) {
+                if (activity.getStorage() != null) {
+                    ListAdapter adapter = activity.getStorage().getListAdapter();
+                    synchronized (adapter) {
+                        ((SoldItemAdapter) adapter).add(new SoldItemWrapper(item, true));
+                        ((ArrayAdapter) adapter).notifyDataSetChanged();
+                    }
+                }
+            }
         }
     }
 
@@ -270,7 +308,7 @@ public class MainActivity extends ActionBarActivity {
                 for (int i = 1; i <= 15; i++) {
                     TimeUnit.SECONDS.sleep(1);
                     Log.d("qwe", "i = " + i
-                            + ", MyTask: " + this.hashCode()
+                            + ", BuyTask: " + this.hashCode()
                             + ", MainActivity: " + MainActivity.this.hashCode());
                 }
                 onProgressUpdate();
@@ -279,11 +317,6 @@ public class MainActivity extends ActionBarActivity {
             }
 
             return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
         }
 
         @Override

@@ -68,7 +68,7 @@ public class SoldItemEditor extends Fragment {
             @Override
             public void onClick(View v) {
                 if (validateFields()) {
-                    mainActivity.addItemAction(getCurrentItem());
+                    mainActivity.createAddItemAction(getCurrentItem());
                     mainActivity.createStorage();
                 }
             }
